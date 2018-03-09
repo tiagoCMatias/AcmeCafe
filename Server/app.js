@@ -12,9 +12,8 @@ const voucherRoute = require('./api/routes/voucher');
 
 
 //connect to mongo
-//const url = 'mongodb://root:' + process.env.MONGO_ATLAS_PW + '@sdpassal-shard-00-00-qbgly.mongodb.net:27017,sdpassal-shard-00-01-qbgly.mongodb.net:27017,sdpassal-shard-00-02-qbgly.mongodb.net:27017/test?ssl=true&replicaSet=SdPassal-shard-0&authSource=admin';
+const url = 'mongodb+srv://' + process.env.MONGO_ATLAS_USER + ':' + process.env.MONGO_ATLAS_PW + '@acmecafe-y4uxw.mongodb.net/test'
 //mongoose.connect(url);
-
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
