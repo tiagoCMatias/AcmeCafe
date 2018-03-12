@@ -9,4 +9,4 @@ const userSchema = Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('User', orderSchema);
+module.exports = mongoose.model('User', userSchema);

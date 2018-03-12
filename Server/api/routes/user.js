@@ -5,7 +5,7 @@ const User = require('../modules/user');
 
 router.get('/', (req, res, next) => {
     res.status(200).json({
-        message: 'USers - GET'
+        message: 'Users ACME - GET'
     });
 });
 
@@ -15,7 +15,11 @@ router.post('/new', (req, res, next) => {
         nif: req.body.nif,
         public_key: req.body.public_key
     });
-
+    res.status(201).json({
+        message: "New user added",
+        user: user
+    });
+    /*
     user
         .save()
         .then(result => {
@@ -24,10 +28,7 @@ router.post('/new', (req, res, next) => {
         .catch(error => {
             console.log(error);
         });
-    res.status(201).json({
-        user: user
-    });
-
+    */
 });
 
 
