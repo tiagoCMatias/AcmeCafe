@@ -19,16 +19,16 @@ router.post('/new', (req, res, next) => {
         message: "New user added",
         user: user
     });
-    /*
+    
     user
-        .save()
-        .then(result => {
-            console.log(Sucess);
-        })
-        .catch(error => {
-            console.log(error);
-        });
-    */
+    .save()
+    .then(result => {
+        console.log("Sucess");
+    })
+    .catch(error => {
+        console.log("error");
+    });
+    
 });
 
 

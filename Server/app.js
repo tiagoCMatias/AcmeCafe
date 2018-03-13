@@ -12,17 +12,10 @@ const voucherRoute = require('./api/routes/voucher');
 
 
 //connect to mongo
-
-const url = 'mongodb+srv://Acmecafe2018*@acmecafe-y4uxw.mongodb.net/test'
-console.log(url);
+const url = 'mongodb://Acme:'+ process.env.MONGO_ATLAS_PW +'@acmecafe-shard-00-00-y4uxw.mongodb.net:27017,acmecafe-shard-00-01-y4uxw.mongodb.net:27017,acmecafe-shard-00-02-y4uxw.mongodb.net:27017/test?ssl=true&replicaSet=AcmeCafe-shard-0&authSource=admin'
+//console.log(url);
 mongoose.connect(url);
-/*
-var uri = "mongodb+srv://kay:myRealPassword@cluster0.mongodb.net/test";
-MongoClient.connect(uri, function(err, client) {
-   const collection = client.db("test").collection("devices");
-   // perform actions on the collection object
-   client.close();
-});*/
+
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
