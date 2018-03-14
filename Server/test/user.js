@@ -14,11 +14,7 @@ chai.use(http);
 
 
 describe('User', () => {
-  beforeEach((done) => { //Before each test we empty the database
-    User.remove({}, (err) => { 
-        done();         
-    });     
-  });
+
   after(function (done) {
     server.close(function () {
       mongoose.connection.close(done)
