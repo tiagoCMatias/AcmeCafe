@@ -12,6 +12,8 @@ import android.widget.ListView;
 
 import com.example.tiagomatias.acme_client.Models.Product;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class ProductsActivity extends AppCompatActivity {
@@ -41,8 +43,9 @@ public class ProductsActivity extends AppCompatActivity {
         products.add(p2);
         products.add(p3);
 
-        showProducts(products);
+        //showProducts(products);
 
+        getProducts();
     }
 
     public void showProducts(ArrayList<Product> productsList){
@@ -57,5 +60,13 @@ public class ProductsActivity extends AppCompatActivity {
     public void makeOrder(){
         Intent intent = new Intent(ProductsActivity.this, OrderActivity.class);
         startActivity(intent);
+    }
+
+    public void getProducts(){
+        GetProduct getProduct = new GetProduct("10.0.2.2:3000/product/all");
+        Thread thr = new Thread(getProduct);
+        thr.start();
+
+
     }
 }

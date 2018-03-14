@@ -151,6 +151,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         //TODO connect to MongoDB
 
+        AddUser adduser = new AddUser("10.0.2.2:3000/user/new");
+
     }
 
     public void encrypt() throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IOException, CertificateException, KeyStoreException, UnrecoverableEntryException {
