@@ -15,18 +15,20 @@ router.post('/new', (req, res, next) => {
         nif: req.body.nif,
         public_key: req.body.public_key
     });
-    res.status(201).json({
-        message: "New user added",
-        user: user
-    });
     
     user
     .save()
     .then(result => {
-        console.log("Sucess");
+        res.status(201).json({
+            message: "New user added",
+            user: user
+        });
     })
     .catch(error => {
-        console.log("error");
+        res.status(201).json({
+            message: "Error found",
+            error: error
+        });
     });
     
 });

@@ -5,4 +5,4 @@ const voucherSchema = Schema({
 
 });
 
-module.exports = mongoose.model('Voucher', orderSchema);
+module.exports = mongoose.model('Voucher', voucherSchema);
