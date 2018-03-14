@@ -7,19 +7,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.PublicKey;
 
 /**
  * Created by Henrique on 14/03/2018.
  */
 
 public class AddUser implements Runnable {
-    String name = "Teste";
-    String nif = "1234";
-    String public_key = "key";
+    String encrypted_name;
+    String nif;
+    String public_key;
     String address;
 
-    AddUser(String baseAddress) {
+    AddUser(String baseAddress, String encrypted_name, String nif, String pk) {
         address = baseAddress;
+        this.encrypted_name = encrypted_name;
+        this.nif = nif;
+        public_key = new String(pk);
     }
 
     @Override
@@ -28,7 +32,7 @@ public class AddUser implements Runnable {
         HttpURLConnection urlConnection = null;
 
         try {
-            url = new URL("http://" + address);
+            url = new URL("http://10.0.2.2:3000" + address);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
@@ -37,7 +41,7 @@ public class AddUser implements Runnable {
             urlConnection.setUseCaches (false);
 
             DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
-            String payload = "{\"username\" : "+ name + ", \"nif\" : "+ nif +",\"public\" : "+public_key +"}";
+            String payload = "{\"username\" : \""+ encrypted_name + "\", \"nif\" : "+ nif +",\"public_key\" : \""+public_key +"\"}";
             System.out.println("payload: " + payload);
             outputStream.writeBytes(payload);
             outputStream.flush();
@@ -45,7 +49,7 @@ public class AddUser implements Runnable {
 
             // get response
             int responseCode = urlConnection.getResponseCode();
-            if(responseCode == 200) {
+            if(responseCode == 201) {
                 String response = readStream(urlConnection.getInputStream());
                 System.out.println(response);
             }

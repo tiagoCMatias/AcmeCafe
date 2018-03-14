@@ -26,7 +26,7 @@ public class GetProduct implements Runnable {
         HttpURLConnection urlConnection = null;
 
         try {
-            url = new URL("http://" + address);
+            url = new URL("http://10.0.2.2:3000" + address);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoInput(true);
             urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -56,6 +56,7 @@ public class GetProduct implements Runnable {
         StringBuffer response = new StringBuffer();
         try {
             reader = new BufferedReader(new InputStreamReader(in));
+
             String line = "";
             while ((line = reader.readLine()) != null) {
                 response.append(line);
@@ -74,6 +75,7 @@ public class GetProduct implements Runnable {
                 }
             }
         }
+
         return response.toString();
     }
 

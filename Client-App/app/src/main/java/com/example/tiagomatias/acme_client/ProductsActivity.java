@@ -12,6 +12,10 @@ import android.widget.ListView;
 
 import com.example.tiagomatias.acme_client.Models.Product;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 public class ProductsActivity extends AppCompatActivity {
 
     ProductsListAdapter adapter;
+    ArrayList<Product> products = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,18 +39,8 @@ public class ProductsActivity extends AppCompatActivity {
             }
         });
 
-        Product p1 = new Product("Expresso", 1.00);
-        Product p2 = new Product("Tosta mista sem fiambre", 2.00);
-        Product p3 = new Product("Um café longo com dois cubos de gelo", 3.00);
-
-        ArrayList<Product> products = new ArrayList<>();
-        products.add(p1);
-        products.add(p2);
-        products.add(p3);
-
-        //showProducts(products);
-
         getProducts();
+        showProducts(products);
     }
 
     public void showProducts(ArrayList<Product> productsList){
@@ -63,10 +58,36 @@ public class ProductsActivity extends AppCompatActivity {
     }
 
     public void getProducts(){
-        GetProduct getProduct = new GetProduct("10.0.2.2:3000/product/all");
+        GetProduct getProduct = new GetProduct("/product/all");
         Thread thr = new Thread(getProduct);
         thr.start();
+        try {
+            thr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
+        String response = getProduct.response;
+
+        createProductObject(response);
+
+    }
+
+    public void createProductObject(String response){
+
+        try {
+            JSONArray json = new JSONArray(response);
+            for (int i = 0; i< json.length(); i++){
+                String name = (String) json.getJSONObject(i).get("name");
+                Double price = (Double) json.getJSONObject(i).get("price");
+
+                Product p = new Product(name, price);
+
+                this.products.add(p);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

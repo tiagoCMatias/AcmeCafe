@@ -145,13 +145,14 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void saveUserToDB() throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, KeyStoreException, CertificateException {
         encrypt();
-        decrypt();
         KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(alias, null);
         publicKey = privateKeyEntry.getCertificate().getPublicKey();
 
         //TODO connect to MongoDB
 
-        AddUser adduser = new AddUser("10.0.2.2:3000/user/new");
+        AddUser adduser = new AddUser("/user/new", encryptedBytes.toString(), nif, publicKey.toString());
+        Thread thr = new Thread(adduser);
+        thr.start();
 
     }
 
