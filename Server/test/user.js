@@ -19,6 +19,11 @@ describe('User', () => {
         done();         
     });     
   });
+  after(function (done) {
+    server.close(function () {
+      mongoose.connection.close(done)
+    });
+  });
   describe('/GET user', () => {
 
     var url = "http://localhost:3000/user";
