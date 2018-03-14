@@ -1,0 +1,6 @@
+{
+    "env": {
+        "MONGO_ATLAS_PW" : "Acmecafe2018*",
+        "MONGO_ATLAS_USER": "acmecafefeup@gmail.com"
+    }
+}
