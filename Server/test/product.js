@@ -1,19 +1,26 @@
+process.env.NODE_ENV = 'test';
+process.env.MONGO_ATLAS_PW = 'Acmecafe2018*';
 
 const mongoose = require("mongoose");
 const Product = require('../api/modules/products');
-const chai = require('chai');
-const http = require('chai-http');
-//const server = require('../server');
-const should = chai.should();
-const request = require("request");
+//Require the dev-dependencies
+let chai = require('chai');
+let chaiHttp = require('chai-http');
+let server = require('../server');
+let should = chai.should();
+let request = require('request');
 const expect  = require("chai").expect;
 
-chai.use(http);
-
+chai.use(chaiHttp);
 
 
 describe('Product', () => {
-  
+
+  after(function (done) {
+    server.close();
+    done();
+  });
+    
   describe('/GET product', () => {
 
     var url = "http://localhost:3000/product/all";
