@@ -67,6 +67,9 @@ public class ProductsListAdapter extends BaseAdapter {
             holder = (ProductHolder) row.getTag();
         }
 
+        holder.name.setText(products.get(position).getName());
+        holder.price.setText(products.get(position).getPrice().toString());
+
         return row;
     }
 

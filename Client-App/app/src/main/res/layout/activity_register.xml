@@ -48,25 +48,25 @@
         android:layout_width="44dp"
         android:layout_height="21dp"
         android:layout_marginBottom="192dp"
-        android:layout_marginLeft="32dp"
+        android:layout_marginStart="28dp"
         android:layout_marginTop="8dp"
         android:text="NIF"
-        android:textSize="18sp"
         android:textColor="#663300"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/confirm"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="180dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="184dp"
         android:text="NAME"
-        android:textSize="18sp"
         android:textColor="#663300"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -96,7 +96,7 @@
         android:inputType="number"
         app:layout_constraintBottom_toTopOf="@+id/confirm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.372"
+        app:layout_constraintHorizontal_bias="0.418"
         app:layout_constraintStart_toEndOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/name"
         app:layout_constraintVertical_bias="0.075" />
