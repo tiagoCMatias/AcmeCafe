@@ -9,6 +9,19 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.get('/all', (req, res, next) => {
+    User.find()
+        .exec()
+        .then(doc => {
+            if(doc){
+                res.status(201).json(doc);
+            }
+        })
+        .catch(error => {
+            res.status(401).json({ message: "error fecthing data" });
+        });
+});
+
 router.post('/new', (req, res, next) => {
     const user = new User({
         name: req.body.username,
@@ -25,13 +38,14 @@ router.post('/new', (req, res, next) => {
         });
     })
     .catch(error => {
-        res.status(201).json({
+        res.status(202).json({
             message: "Error found",
             error: error
         });
     });
     
 });
+
 
 
 

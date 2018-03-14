@@ -7,4 +7,4 @@ var config = {
 	messagingSenderId: "3749112265"
 };
 
-export config;
+export default config;
