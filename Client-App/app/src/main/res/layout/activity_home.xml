@@ -7,7 +7,7 @@
     tools:context="com.example.tiagomatias.acme_client.HomeActivity">
 
     <Button
-        android:id="@+id/products"
+        android:id="@+id/order_products"
         android:layout_width="0dp"
         android:layout_height="54dp"
         android:layout_marginBottom="8dp"
@@ -34,7 +34,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/products"
+        app:layout_constraintTop_toBottomOf="@+id/order_products"
         app:layout_constraintVertical_bias="0.143" />
 
     <Button

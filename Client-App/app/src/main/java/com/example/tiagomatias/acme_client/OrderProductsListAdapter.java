@@ -10,7 +10,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.tiagomatias.acme_client.Models.OrderProduct;
-import com.example.tiagomatias.acme_client.Models.Product;
 
 import java.util.ArrayList;
 
@@ -32,7 +31,7 @@ public class OrderProductsListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return orderProducts.size();
     }
 
     @Override
@@ -74,13 +73,13 @@ public class OrderProductsListAdapter extends BaseAdapter {
         holder.price.setText(orderProducts.get(position).getPrice().toString());
         holder.quantity.setText(orderProducts.get(position).getQuantity().toString());
 
-        ImageButton minus = (ImageButton) row.findViewById(R.id.minus);
+        ImageButton minus =  row.findViewById(R.id.minus);
         final ProductHolder finalHolder = holder;
         minus.setOnClickListener(new View.OnClickListener() {
-            Integer quantity = orderProducts.get(position).getQuantity();
+
             @Override
             public void onClick(View v) {
-
+                Integer quantity = orderProducts.get(position).getQuantity();
                 if(quantity > 0){
                     quantity -= 1;
                     orderProducts.get(position).setQuantity(quantity);
@@ -89,12 +88,13 @@ public class OrderProductsListAdapter extends BaseAdapter {
             }
         });
 
-        ImageButton plus = (ImageButton) row.findViewById(R.id.minus);
+        ImageButton plus = (ImageButton) row.findViewById(R.id.plus);
         final ProductHolder finalHolderP = holder;
-        minus.setOnClickListener(new View.OnClickListener() {
-            Integer quantity = orderProducts.get(position).getQuantity();
+        plus.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+                    Integer quantity = orderProducts.get(position).getQuantity();
                     quantity += 1;
                     orderProducts.get(position).setQuantity(quantity);
                     finalHolderP.quantity.setText(orderProducts.get(position).getQuantity().toString());

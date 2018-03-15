@@ -13,7 +13,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Button productsButton = (Button) findViewById(R.id.products);
+        Button productsButton = (Button) findViewById(R.id.order_products);
         productsButton.setOnClickListener( new View.OnClickListener() {
 
             @Override

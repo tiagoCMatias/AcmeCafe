@@ -8,6 +8,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -150,7 +151,16 @@ public class RegisterActivity extends AppCompatActivity {
 
         //TODO connect to MongoDB
 
-        AddUser adduser = new AddUser("/user/new", encryptedBytes.toString(), nif, publicKey.toString());
+        System.out.println("Kehey");
+        System.out.println((Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT)));
+        System.out.println(publicKey.getEncoded().toString());
+        System.out.println(publicKey.getEncoded());
+        System.out.println(publicKey.getFormat());
+        System.out.println(publicKey.getAlgorithm());
+
+        String publicKeyBase64 = Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT);
+
+        AddUser adduser = new AddUser("/user/new", encryptedBytes.toString(), nif, publicKeyBase64);
         Thread thr = new Thread(adduser);
         thr.start();
 

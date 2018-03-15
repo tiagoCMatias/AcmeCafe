@@ -19,20 +19,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
     <ListView
-        android:id="@+id/products"
-        android:layout_width="344dp"
+        android:id="@+id/order_products"
+        android:layout_width="fill_parent"
         android:layout_height="405dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/orderText"
-        app:layout_constraintVertical_bias="0.764" />
+        app:layout_constraintVertical_bias="0.529" />
 
     <TextView
         android:id="@+id/priceView"
@@ -44,12 +42,12 @@
         android:layout_marginTop="8dp"
         android:text="Price (€)"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/products"
+        app:layout_constraintBottom_toTopOf="@+id/order_products"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.426"
+        app:layout_constraintHorizontal_bias="0.527"
         app:layout_constraintStart_toEndOf="@+id/nameView"
         app:layout_constraintTop_toBottomOf="@+id/orderText"
-        app:layout_constraintVertical_bias="0.53" />
+        app:layout_constraintVertical_bias="0.47" />
 
     <TextView
         android:id="@+id/nameView"
@@ -60,7 +58,7 @@
         android:layout_marginTop="8dp"
         android:text="Product"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/products"
+        app:layout_constraintBottom_toTopOf="@+id/order_products"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/orderText" />
 

@@ -8,15 +8,19 @@ import android.content.Intent;
 
 public class OrderProduct {
 
+    String id;
     String productName;
     Double productPrice;
     Integer quantity;
 
-    public OrderProduct(String name, Double price){
+    public OrderProduct(String id, String name, Double price){
+        this.id = id;
         this.productName = name;
         this.productPrice = price;
         this.quantity = 0;
     }
+
+    public String getId(){return this.id;}
 
     public String getName(){
         return productName;
@@ -27,6 +31,7 @@ public class OrderProduct {
     }
 
     public Integer getQuantity(){return quantity;}
+
 
     public void setName(String productName){
         this.productName = productName;

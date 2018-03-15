@@ -1,12 +1,9 @@
 package com.example.tiagomatias.acme_client;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -14,10 +11,7 @@ import com.example.tiagomatias.acme_client.Models.Product;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class ProductsActivity extends AppCompatActivity {
@@ -44,7 +38,7 @@ public class ProductsActivity extends AppCompatActivity {
     }
 
     public void showProducts(ArrayList<Product> productsList){
-        final ListView products = findViewById(R.id.products);
+        final ListView products = findViewById(R.id.order_products);
 
         adapter =  new ProductsListAdapter(this,
                 R.layout.products_item, productsList);
@@ -79,10 +73,11 @@ public class ProductsActivity extends AppCompatActivity {
         try {
             JSONArray json = new JSONArray(response);
             for (int i = 0; i< json.length(); i++){
+                String id = (String) json.getJSONObject(i).get("_id");
                 String name = (String) json.getJSONObject(i).get("name");
                 Double price = (Double) json.getJSONObject(i).get("price");
 
-                Product p = new Product(name, price);
+                Product p = new Product(id, name, price);
 
                 this.products.add(p);
             }

@@ -23,7 +23,7 @@ public class AddUser implements Runnable {
         address = baseAddress;
         this.encrypted_name = encrypted_name;
         this.nif = nif;
-        public_key = new String(pk);
+        public_key = pk;
     }
 
     @Override
