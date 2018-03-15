@@ -9,6 +9,8 @@ node_js:
 - 4
 before_install:
 - npm install -g node-gyp
+install:
+- npm install -g codecov
 before_script:
 - npm install
 - npm install -g standard

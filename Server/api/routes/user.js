@@ -34,7 +34,7 @@ router.post('/new', (req, res, next) => {
     .then(result => {
         res.status(201).json({
             message: "New user added",
-            user: user
+            //user: user
         });
     })
     .catch(error => {
@@ -44,6 +44,14 @@ router.post('/new', (req, res, next) => {
         });
     });
     
+});
+
+
+router.delete('/delete/:id' , (req, res, next) => {
+    User.findByIdAndRemove(req.params.id, function (err, user) {
+        if (err)
+            throw err; 
+    });
 });
 
 

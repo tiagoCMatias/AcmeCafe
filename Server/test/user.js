@@ -15,15 +15,44 @@ chai.use(http);
 
 describe('User', () => {
 
+  before(function () {
+    server.listen(3000);
+    
+  });
+  beforeEach((done) => { //Before each test we empty the database
+    User.remove({}, (err) => { 
+        done();         
+    });     
+  });
+
   after(function (done) {
     server.close(function () {
       mongoose.connection.close(done)
     });
   });
-  describe('/GET user', () => {
-
+  
+/*
+  describe('/Post user', () => {
     var url = "http://localhost:3000/user";
+    it("should NOT add a USER without public_key", function (done) {
+      let user = {
+        name: "Teste",
+        nif: "123412"
+      };
+      chai.request(url)
+        .post('/new')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(user)
+        .end((err, res) => {
+          res.should.have.status(202);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+        });
+    });
+  });*/
 
+  describe('/GET user', () => {
+    var url = "http://localhost:3000/user";
     it("returns status 201", function(done) {
       chai.request(server)
             .get('/user/all')

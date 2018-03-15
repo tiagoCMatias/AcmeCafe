@@ -16,9 +16,12 @@ chai.use(chaiHttp);
 
 describe('Product', () => {
 
-  after(function (done) {
+  before(function () {
+    server.listen(3000);
+  });
+
+  after(function () {
     server.close();
-    done();
   });
     
   describe('/GET product', () => {
