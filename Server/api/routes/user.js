@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const NodeRSA = require('node-rsa');
+
 
 const User = require('../modules/user');
 
@@ -29,6 +31,12 @@ router.post('/new', (req, res, next) => {
         public_key: req.body.public_key
     });
     
+    var key = new NodeRSA({b: req.body.public_key});
+
+    var username = key.decrypt(req.body.username, 'utf8');
+    
+    console.log(username);
+
     user
     .save()
     .then(result => {
