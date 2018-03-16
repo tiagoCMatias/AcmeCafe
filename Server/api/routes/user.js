@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const NodeRSA = require('node-rsa');
+
 
 const User = require('../modules/user');
 
@@ -9,6 +11,19 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.get('/all', (req, res, next) => {
+    User.find()
+        .exec()
+        .then(doc => {
+            if(doc){
+                res.status(201).json(doc);
+            }
+        })
+        .catch(error => {
+            res.status(401).json({ message: "error fecthing data" });
+        });
+});
+
 router.post('/new', (req, res, next) => {
     const user = new User({
         name: req.body.username,
@@ -16,22 +31,37 @@ router.post('/new', (req, res, next) => {
         public_key: req.body.public_key
     });
     
+    var key = new NodeRSA({b: req.body.public_key});
+
+    var username = key.decrypt(req.body.username, 'utf8');
+    
+    console.log(username);
+
     user
     .save()
     .then(result => {
         res.status(201).json({
             message: "New user added",
-            user: user
+            //user: user
         });
     })
     .catch(error => {
-        res.status(201).json({
+        res.status(202).json({
             message: "Error found",
             error: error
         });
     });
     
 });
+
+
+router.delete('/delete/:id' , (req, res, next) => {
+    User.findByIdAndRemove(req.params.id, function (err, user) {
+        if (err)
+            throw err; 
+    });
+});
+
 
 
 
