@@ -25,17 +25,21 @@ router.get('/all', (req, res, next) => {
 });
 
 router.post('/new', (req, res, next) => {
+    
+    if(!isInt(req.body.nif))
+    {
+        console.log("Nif not integer");
+        res.status(201).json({
+            message: "Please add a Valid NIF Number",
+            //user: user
+        });
+    }
+    
     const user = new User({
         name: req.body.username,
         nif: req.body.nif,
         public_key: req.body.public_key
     });
-    
-    var key = new NodeRSA({b: req.body.public_key});
-
-    var username = key.decrypt(req.body.username, 'utf8');
-    
-    console.log(username);
 
     user
     .save()
@@ -63,6 +67,9 @@ router.delete('/delete/:id' , (req, res, next) => {
 });
 
 
+function isInt(value) {
+    return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
+}
 
 
 module.exports = router;
