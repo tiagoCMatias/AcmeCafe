@@ -15,7 +15,6 @@ install:
 before_script:
 - npm install
 - npm install -g standard
-- cd ..
 script:
 - npm test
 after_success: npm run coverage
