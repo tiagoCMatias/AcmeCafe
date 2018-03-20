@@ -4,11 +4,11 @@ process.env.MONGO_ATLAS_PW = 'Acmecafe2018*';
 const mongoose = require("mongoose");
 const Product = require('../api/modules/products');
 //Require the dev-dependencies
-let chai = require('chai');
-let chaiHttp = require('chai-http');
-let server = require('../server');
-let should = chai.should();
-let request = require('request');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../server');
+const should = chai.should();
+const request = require('request');
 const expect  = require("chai").expect;
 
 chai.use(chaiHttp);
