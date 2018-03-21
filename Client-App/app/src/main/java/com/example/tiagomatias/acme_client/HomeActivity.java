@@ -33,14 +33,5 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        Button voucherButton = (Button) findViewById(R.id.vouchers);
-        voucherButton.setOnClickListener( new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, VouchersActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 }

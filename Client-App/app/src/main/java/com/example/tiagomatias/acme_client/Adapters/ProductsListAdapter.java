@@ -1,4 +1,4 @@
-package com.example.tiagomatias.acme_client;
+package com.example.tiagomatias.acme_client.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.tiagomatias.acme_client.Models.Product;
+import com.example.tiagomatias.acme_client.R;
 
 import java.util.ArrayList;
 

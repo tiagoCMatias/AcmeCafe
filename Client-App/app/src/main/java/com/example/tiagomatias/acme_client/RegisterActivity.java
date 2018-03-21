@@ -131,25 +131,18 @@ public class RegisterActivity extends AppCompatActivity {
 
         keyPair = generator.generateKeyPair();
 
-
-        // Writing username to SharedPreferences
-        SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("username", username);
-        editor.putString("nif", nif);
-        editor.commit();
-
         saveUserToDB();
 
     }
 
 
     public void saveUserToDB() throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException, KeyStoreException, CertificateException {
-        encrypt();
+
         KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(alias, null);
         publicKey = privateKeyEntry.getCertificate().getPublicKey();
 
-        //TODO connect to MongoDB
+        String PubKeyString = byteArrayToHex(((RSAPublicKey)publicKey).getModulus().toByteArray());
+
 
         System.out.println("Kehey");
         System.out.println((Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT)));
@@ -157,13 +150,31 @@ public class RegisterActivity extends AppCompatActivity {
         System.out.println(publicKey.getEncoded());
         System.out.println(publicKey.getFormat());
         System.out.println(publicKey.getAlgorithm());
+        System.out.println("STRING:" + PubKeyString);
 
-        String publicKeyBase64 = Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT);
-
-        AddUser adduser = new AddUser("/user/new", encryptedBytes.toString(), nif, publicKeyBase64);
+        AddUser adduser = new AddUser("/user/new", username, nif, PubKeyString);
         Thread thr = new Thread(adduser);
         thr.start();
 
+        try {
+            thr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (adduser.responseCode == 201){
+            saveUserToSharedPreferences();
+        }
+
+    }
+
+    public void saveUserToSharedPreferences(){
+        // Writing username to SharedPreferences
+        SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("username", username);
+        editor.putString("nif", nif);
+        editor.commit();
     }
 
     public void encrypt() throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IOException, CertificateException, KeyStoreException, UnrecoverableEntryException {
@@ -218,5 +229,12 @@ public class RegisterActivity extends AppCompatActivity {
         System.out.println("DDecrypted?????" + decrypted);
         return decrypted;
     }*/
+
+    String byteArrayToHex(byte[] ba) {
+        StringBuilder sb = new StringBuilder(ba.length * 2);
+        for(byte b: ba)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
+    }
 
 }

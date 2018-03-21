@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.example.tiagomatias.acme_client.Adapters.ProductsListAdapter;
 import com.example.tiagomatias.acme_client.Models.Product;
 
 import org.json.JSONArray;
