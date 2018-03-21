@@ -2,11 +2,13 @@ package com.example.tiagomatias.acme_client.Models;
 
 import android.content.Intent;
 
+import java.io.Serializable;
+
 /**
  * Created by Henrique on 13/03/2018.
  */
 
-public class OrderProduct {
+public class OrderProduct implements Serializable {
 
     String id;
     String productName;

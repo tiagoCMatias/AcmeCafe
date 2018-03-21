@@ -1,4 +1,4 @@
-package com.example.tiagomatias.acme_client;
+package com.example.tiagomatias.acme_client.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.tiagomatias.acme_client.Models.OrderProduct;
+import com.example.tiagomatias.acme_client.R;
 
 import java.util.ArrayList;
 
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 
 public class OrderProductsListAdapter extends BaseAdapter {
 
-    ArrayList<OrderProduct> orderProducts;
+    public ArrayList<OrderProduct> orderProducts;
     int layoutId;
     Context mContext;
 

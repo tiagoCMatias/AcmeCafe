@@ -18,6 +18,8 @@ public class AddUser implements Runnable {
     String nif;
     String public_key;
     String address;
+    int responseCode;
+
 
     AddUser(String baseAddress, String encrypted_name, String nif, String pk) {
         address = baseAddress;
@@ -41,7 +43,7 @@ public class AddUser implements Runnable {
             urlConnection.setUseCaches (false);
 
             DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
-            String payload = "{\"username\" : \""+ encrypted_name + "\", \"nif\" : "+ nif +",\"public_key\" : \""+public_key +"\"}";
+            String payload = "{\"username\" : \""+ encrypted_name + "\", \"nif\" : "+ nif +", \"public_key\" : \""+public_key +"\"}";
             System.out.println("payload: " + payload);
             outputStream.writeBytes(payload);
             outputStream.flush();
@@ -50,11 +52,14 @@ public class AddUser implements Runnable {
             // get response
             int responseCode = urlConnection.getResponseCode();
             if(responseCode == 201) {
+                this.responseCode = responseCode;
                 String response = readStream(urlConnection.getInputStream());
                 System.out.println(response);
             }
-            else
+            else {
+                this.responseCode = responseCode;
                 System.out.println("Code: " + responseCode);
+            }
         }
         catch (Exception e) {
             System.out.println(e.toString());
@@ -90,4 +95,6 @@ public class AddUser implements Runnable {
         }
         return response.toString();
     }
+
+
 }

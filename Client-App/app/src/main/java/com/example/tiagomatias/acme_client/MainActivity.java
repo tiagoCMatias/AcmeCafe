@@ -62,12 +62,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void verifyRegistration() throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, UnrecoverableEntryException, InvalidKeyException, BadPaddingException, NoSuchPaddingException, IllegalBlockSizeException {
 
-        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-        keyStore.load(null);
 
-        String alias = "keys";
+        SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
 
-        if (!keyStore.containsAlias(alias)) {
+        if (!settings.contains("username")) {
 
             Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -81,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
         username = settings.getString("username", "NOT FOUND");
 
-        getKeys();
-        encrypt();
+//        getKeys();
+//        encrypt();
 
         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
         startActivity(intent);
