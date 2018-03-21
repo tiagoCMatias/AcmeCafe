@@ -46,7 +46,7 @@ router.post('/new', (req, res, next) => {
     .then(result => {
         res.status(201).json({
             message: "New user added",
-            //user: user
+            user: user
         });
     })
     .catch(error => {
