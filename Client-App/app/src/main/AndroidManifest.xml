@@ -23,7 +23,8 @@
         <activity android:name=".ProductsActivity" />
         <activity android:name=".OrderActivity" />
         <activity android:name=".VouchersActivity" />
-        <activity android:name=".OrderConfirmActivity"></activity>
+        <activity android:name=".OrderConfirmActivity" />
+        <activity android:name=".NfcActivity"></activity>
     </application>
 
 </manifest>

@@ -18,6 +18,7 @@ public class AddUser implements Runnable {
     String nif;
     String public_key;
     String address;
+    String response;
     int responseCode;
 
 
@@ -54,7 +55,7 @@ public class AddUser implements Runnable {
             if(responseCode == 201) {
                 this.responseCode = responseCode;
                 String response = readStream(urlConnection.getInputStream());
-                System.out.println(response);
+                this.response = response;
             }
             else {
                 this.responseCode = responseCode;

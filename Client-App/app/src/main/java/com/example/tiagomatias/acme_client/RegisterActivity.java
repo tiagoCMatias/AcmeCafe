@@ -163,12 +163,20 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (adduser.responseCode == 201){
-            saveUserToSharedPreferences();
+
+            String response = adduser.response;
+
+            saveUserToSharedPreferences(response);
         }
 
     }
 
-    public void saveUserToSharedPreferences(){
+    public void saveUserToSharedPreferences(String response){
+
+        //Get the UserId from the response
+
+
+
         // Writing username to SharedPreferences
         SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();

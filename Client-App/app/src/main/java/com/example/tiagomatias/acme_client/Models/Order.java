@@ -1,5 +1,6 @@
 package com.example.tiagomatias.acme_client.Models;
 
+import java.security.PrivateKey;
 import java.util.ArrayList;
 
 /**
@@ -8,15 +9,16 @@ import java.util.ArrayList;
 
 public class Order {
 
-
+    String userId;
     ArrayList<OrderProduct> products;
     ArrayList<Voucher> vouchers;
     Double price;
 
-    public Order(ArrayList<OrderProduct> products, Double price){
+    public Order(String userId, ArrayList<OrderProduct> products, ArrayList<Voucher> vouchers, Double price){
+        this.userId = userId;
         this.products = products;
         this.price = price;
-        this.vouchers = new ArrayList<>();
+        this.vouchers = vouchers;
     }
 
     public ArrayList<OrderProduct> getProducts() {
