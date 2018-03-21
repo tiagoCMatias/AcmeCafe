@@ -11,7 +11,7 @@ router.get('/', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
     
-    let product = JSON.stringify(req.body.products);
+    const product = JSON.stringify(req.body.products);
     
     const order = new Order({
         products: [req.body.products],

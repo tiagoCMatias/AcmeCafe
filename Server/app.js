@@ -15,7 +15,7 @@ const voucherRoute = require('./api/routes/voucher');
 const url = 'mongodb://Acme:'+ process.env.MONGO_ATLAS_PW +'@acmecafe-shard-00-00-y4uxw.mongodb.net:27017,acmecafe-shard-00-01-y4uxw.mongodb.net:27017,acmecafe-shard-00-02-y4uxw.mongodb.net:27017/test?ssl=true&replicaSet=AcmeCafe-shard-0&authSource=admin'
 console.log(url);
 mongoose.connect(url);
-let db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 

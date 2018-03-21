@@ -8,7 +8,7 @@ const http = require('chai-http');
 const server = require('../server');
 const request = require("request");
 const expect  = require("chai").expect;
-let should = chai.should();
+const should = chai.should();
 
 chai.use(http);
 
