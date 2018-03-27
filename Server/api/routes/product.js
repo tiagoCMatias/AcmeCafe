@@ -28,7 +28,8 @@ router.post('/new', (req, res, next) => {
 
     const product = new Product({
         name: req.body.name,
-        price: req.body.price
+        price: req.body.price,
+        tag_number: req.body.tag
     });
 
     product
@@ -47,5 +48,15 @@ router.post('/new', (req, res, next) => {
     });
 
 })
+
+router.delete('/:id' , (req, res, next) => {
+    Product.findByIdAndRemove(req.params.id, function (err, user) {
+        if (err)
+            throw err; 
+    });
+    res.status(201).json({
+        message: "Product deleted",
+    });
+});
 
 module.exports = router;

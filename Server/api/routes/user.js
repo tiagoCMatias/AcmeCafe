@@ -31,7 +31,7 @@ router.post('/new', (req, res, next) => {
         console.log("Nif not integer");
         res.status(201).json({
             message: "Please add a Valid NIF Number",
-            //user: user
+            user: user
         });
     }
     
