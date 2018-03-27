@@ -52,6 +52,7 @@ public class AddUser implements Runnable {
 
             // get response
             int responseCode = urlConnection.getResponseCode();
+            System.out.println("ADDINg");
             if(responseCode == 201) {
                 this.responseCode = responseCode;
                 String response = readStream(urlConnection.getInputStream());

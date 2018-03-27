@@ -73,7 +73,7 @@ public class ConfirmOrderProductsListAdapter extends BaseAdapter {
         Double pricePerProduct = orderProducts.get(position).getPrice() * orderProducts.get(position).getQuantity();
         Double pricePerProductRound = Math.round(pricePerProduct * 100.0)/100.0;
         holder.price.setText(String.valueOf(pricePerProductRound) + " €");
-        holder.quantity.setText(orderProducts.get(position).getQuantity().toString() + " x ");
+        holder.quantity.setText(String.valueOf(orderProducts.get(position).getQuantity()) + " x ");
 
         return row;
     }

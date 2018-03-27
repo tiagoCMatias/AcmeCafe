@@ -72,7 +72,7 @@ public class OrderProductsListAdapter extends BaseAdapter {
 
         holder.name.setText(orderProducts.get(position).getName());
         holder.price.setText(orderProducts.get(position).getPrice().toString());
-        holder.quantity.setText(orderProducts.get(position).getQuantity().toString());
+        holder.quantity.setText(String.valueOf(orderProducts.get(position).getQuantity()));
 
         ImageButton minus =  row.findViewById(R.id.minus);
         final ProductHolder finalHolder = holder;
@@ -84,7 +84,7 @@ public class OrderProductsListAdapter extends BaseAdapter {
                 if(quantity > 0){
                     quantity -= 1;
                     orderProducts.get(position).setQuantity(quantity);
-                    finalHolder.quantity.setText(orderProducts.get(position).getQuantity().toString());
+                    finalHolder.quantity.setText(String.valueOf(orderProducts.get(position).getQuantity()));
                 }
             }
         });
@@ -98,7 +98,7 @@ public class OrderProductsListAdapter extends BaseAdapter {
                     Integer quantity = orderProducts.get(position).getQuantity();
                     quantity += 1;
                     orderProducts.get(position).setQuantity(quantity);
-                    finalHolderP.quantity.setText(orderProducts.get(position).getQuantity().toString());
+                    finalHolderP.quantity.setText(String.valueOf(orderProducts.get(position).getQuantity()));
             }
         });
 

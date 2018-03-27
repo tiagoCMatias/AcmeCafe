@@ -22,17 +22,24 @@ public class GetProduct implements Runnable {
 
     @Override
     public void run() {
+
         URL url;
         HttpURLConnection urlConnection = null;
 
         try {
+
             url = new URL("http://10.0.2.2:3000" + address);
+
             urlConnection = (HttpURLConnection) url.openConnection();
+
             urlConnection.setDoInput(true);
+
             urlConnection.setRequestProperty("Content-Type", "application/json");
+
             urlConnection.setUseCaches (false);
 
             int responseCode = urlConnection.getResponseCode();
+            System.out.println("HEERE8");
             if(responseCode == 201) {
                 String response = readStream(urlConnection.getInputStream());
                 System.out.println(response);

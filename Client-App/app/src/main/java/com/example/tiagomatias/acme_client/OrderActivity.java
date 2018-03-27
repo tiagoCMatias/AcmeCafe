@@ -58,19 +58,17 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     public void getProducts(){
+
         GetProduct getProduct = new GetProduct("/product/all");
         Thread thr = new Thread(getProduct);
         thr.start();
         try {
             thr.join();
+            String response = getProduct.response;
+            createProductObject(response);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
-        String response = getProduct.response;
-
-        createProductObject(response);
 
     }
 

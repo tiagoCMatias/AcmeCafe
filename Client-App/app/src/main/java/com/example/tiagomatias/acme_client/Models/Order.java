@@ -1,5 +1,6 @@
 package com.example.tiagomatias.acme_client.Models;
 
+import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 
@@ -7,7 +8,7 @@ import java.util.ArrayList;
  * Created by Henrique on 19/03/2018.
  */
 
-public class Order {
+public class Order implements Serializable{
 
     String userId;
     ArrayList<OrderProduct> products;

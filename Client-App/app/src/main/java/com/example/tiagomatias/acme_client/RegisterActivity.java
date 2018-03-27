@@ -3,9 +3,11 @@ package com.example.tiagomatias.acme_client;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.Tag;
+import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -13,6 +15,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.example.tiagomatias.acme_client.Models.Product;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
     PrivateKey privateKey;
     byte[] encryptedBytes,decryptedBytes;
     Cipher eCipher,dCipher;
-    String encrypted,decrypted, username, nif;
+    String encrypted,decrypted, username, nif, userId;
     String alias= "keys";
 
     @Override
@@ -66,6 +74,7 @@ public class RegisterActivity extends AppCompatActivity {
         Button clickButton = (Button) findViewById(R.id.confirm);
         clickButton.setOnClickListener( new View.OnClickListener() {
 
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 addUser(name, number);
@@ -76,6 +85,7 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void addUser(EditText et_name, EditText et_nif) {
         nif = et_nif.getText().toString();
         username = et_name.getText().toString();
@@ -109,16 +119,19 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void keyStore() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, IOException, CertificateException, KeyStoreException, UnrecoverableEntryException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
 
         keyStore = KeyStore.getInstance("AndroidKeyStore");
         keyStore.load(null);
+
 
         Calendar notBefore = Calendar.getInstance();
         Calendar notAfter = Calendar.getInstance();
 
         KeyPairGeneratorSpec spec =
                 new KeyPairGeneratorSpec.Builder(this)
+                        .setKeySize(512)
                         .setAlias(alias)
                         .setSubject(new X500Principal("CN=" + alias))
                         .setSerialNumber(BigInteger.valueOf(1337))
@@ -130,6 +143,7 @@ public class RegisterActivity extends AppCompatActivity {
         generator.initialize(spec);
 
         keyPair = generator.generateKeyPair();
+
 
         saveUserToDB();
 
@@ -143,14 +157,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         String PubKeyString = byteArrayToHex(((RSAPublicKey)publicKey).getModulus().toByteArray());
 
-
-        System.out.println("Kehey");
-        System.out.println((Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT)));
-        System.out.println(publicKey.getEncoded().toString());
-        System.out.println(publicKey.getEncoded());
-        System.out.println(publicKey.getFormat());
-        System.out.println(publicKey.getAlgorithm());
-        System.out.println("STRING:" + PubKeyString);
 
         AddUser adduser = new AddUser("/user/new", username, nif, PubKeyString);
         Thread thr = new Thread(adduser);
@@ -174,7 +180,15 @@ public class RegisterActivity extends AppCompatActivity {
     public void saveUserToSharedPreferences(String response){
 
         //Get the UserId from the response
-
+        try {
+            JSONObject json = new JSONObject(response);
+            JSONObject user = (JSONObject) json.get("user");
+            String userId = (String) user.get("_id");
+            this.userId = userId;
+            System.out.println("UID; "+ userId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
 
         // Writing username to SharedPreferences
@@ -182,10 +196,11 @@ public class RegisterActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("username", username);
         editor.putString("nif", nif);
+        editor.putString("userId", userId);
         editor.commit();
     }
 
-    public void encrypt() throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IOException, CertificateException, KeyStoreException, UnrecoverableEntryException {
+  /*  public void encrypt() throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IOException, CertificateException, KeyStoreException, UnrecoverableEntryException {
         keyStore = KeyStore.getInstance("AndroidKeyStore");
         keyStore.load(null);
 
@@ -210,33 +225,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         System.out.println("PUBK: " + publicKey.toString());
         System.out.println("D-CR: " + decryptedBytes.toString());
-    }
-
-    /*public byte[] RSAEncrypt(final String username) throws NoSuchAlgorithmException, NoSuchPaddingException,
-            InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(1024);
-        kp = kpg.genKeyPair();
-        publicKey = kp.getPublic();
-        privateKey = kp.getPrivate();
-
-        cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-        encryptedBytes = cipher.doFinal(username.getBytes());
-
-        return encryptedBytes;
     }*/
 
-    /*public String RSADecrypt(final byte[] encryptedBytes) throws NoSuchAlgorithmException, NoSuchPaddingException,
-            InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-
-        cipher1 = Cipher.getInstance("RSA");
-        cipher1.init(Cipher.DECRYPT_MODE, publicKey);
-        decryptedBytes = cipher1.doFinal(encryptedBytes);
-        decrypted = new String(decryptedBytes);
-        System.out.println("DDecrypted?????" + decrypted);
-        return decrypted;
-    }*/
 
     String byteArrayToHex(byte[] ba) {
         StringBuilder sb = new StringBuilder(ba.length * 2);

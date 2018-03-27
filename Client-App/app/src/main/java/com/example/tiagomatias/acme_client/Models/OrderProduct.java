@@ -13,7 +13,7 @@ public class OrderProduct implements Serializable {
     String id;
     String productName;
     Double productPrice;
-    Integer quantity;
+    int quantity;
 
     public OrderProduct(String id, String name, Double price){
         this.id = id;
@@ -32,7 +32,7 @@ public class OrderProduct implements Serializable {
         return productPrice;
     }
 
-    public Integer getQuantity(){return quantity;}
+    public int getQuantity(){return quantity;}
 
 
     public void setName(String productName){

@@ -74,6 +74,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
 
     public void nfcCall(){
         Intent intent = new Intent(OrderConfirmActivity.this, NfcActivity.class);
-        intent.putExtra("order", (Serializable) order);
+        intent.putExtra("order", order);
+        startActivity(intent);
     }
 }
