@@ -77,8 +77,9 @@ public class ProductsActivity extends AppCompatActivity {
                 String id = (String) json.getJSONObject(i).get("_id");
                 String name = (String) json.getJSONObject(i).get("name");
                 Double price = (Double) json.getJSONObject(i).get("price");
+                Integer tag_number = (Integer)json.getJSONObject(i).get("tag_number");
 
-                Product p = new Product(id, name, price);
+                Product p = new Product(id, name, price, tag_number);
 
                 this.products.add(p);
             }

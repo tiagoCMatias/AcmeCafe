@@ -28,7 +28,7 @@ public class GetProduct implements Runnable {
 
         try {
 
-            url = new URL("http://10.0.2.2:3000" + address);
+            url = new URL("http://192.168.1.179:3000" + address);
 
             urlConnection = (HttpURLConnection) url.openConnection();
 

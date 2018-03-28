@@ -1,32 +1,23 @@
 package com.example.tiagomatias.acme_client;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.PublicKey;
 
 /**
- * Created by Henrique on 14/03/2018.
+ * Created by Henrique on 27/03/2018.
  */
 
-public class AddUser implements Runnable {
-    String encrypted_name;
-    String nif;
-    String public_key;
-    String address;
+public class GetVoucher implements Runnable {
+
+    String address = null;
     String response;
-    int responseCode;
 
-
-    AddUser(String baseAddress, String encrypted_name, String nif, String pk) {
+    GetVoucher(String baseAddress) {
         address = baseAddress;
-        this.encrypted_name = encrypted_name;
-        this.nif = nif;
-        public_key = pk;
     }
 
     @Override
@@ -35,33 +26,26 @@ public class AddUser implements Runnable {
         HttpURLConnection urlConnection = null;
 
         try {
+
             url = new URL("http://192.168.1.179:3000" + address);
+
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setDoOutput(true);
+
             urlConnection.setDoInput(true);
-            urlConnection.setRequestMethod("POST");
+
             urlConnection.setRequestProperty("Content-Type", "application/json");
+
             urlConnection.setUseCaches (false);
 
-            DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
-            String payload = "{\"username\" : \""+ encrypted_name + "\", \"nif\" : "+ nif +", \"public_key\" : \""+public_key +"\"}";
-            System.out.println("payload: " + payload);
-            outputStream.writeBytes(payload);
-            outputStream.flush();
-            outputStream.close();
-
-            // get response
             int responseCode = urlConnection.getResponseCode();
-            System.out.println("ADDINg");
-            if(responseCode == 201) {
-                this.responseCode = responseCode;
+            System.out.println("HEERE8");
+            if(responseCode == 200) {
                 String response = readStream(urlConnection.getInputStream());
+                System.out.println(response);
                 this.response = response;
             }
-            else {
-                this.responseCode = responseCode;
+            else
                 System.out.println("Code: " + responseCode);
-            }
         }
         catch (Exception e) {
             System.out.println(e.toString());
@@ -70,6 +54,7 @@ public class AddUser implements Runnable {
             if(urlConnection != null)
                 urlConnection.disconnect();
         }
+
     }
 
     private String readStream(InputStream in) {
@@ -77,6 +62,7 @@ public class AddUser implements Runnable {
         StringBuffer response = new StringBuffer();
         try {
             reader = new BufferedReader(new InputStreamReader(in));
+
             String line = "";
             while ((line = reader.readLine()) != null) {
                 response.append(line);
@@ -95,8 +81,7 @@ public class AddUser implements Runnable {
                 }
             }
         }
+
         return response.toString();
     }
-
-
 }

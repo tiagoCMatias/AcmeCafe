@@ -80,8 +80,9 @@ public class OrderActivity extends AppCompatActivity {
                 String id = (String) json.getJSONObject(i).get("_id");
                 String name = (String) json.getJSONObject(i).get("name");
                 Double price = (Double) json.getJSONObject(i).get("price");
+                Integer tag_number = (Integer)json.getJSONObject(i).get("tag_number");
 
-                OrderProduct p = new OrderProduct(id, name, price);
+                OrderProduct p = new OrderProduct(id, name, price, tag_number);
 
                 this.products.add(p);
             }

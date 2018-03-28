@@ -11,18 +11,24 @@ import java.io.Serializable;
 public class OrderProduct implements Serializable {
 
     String id;
+    int tag_number;
     String productName;
     Double productPrice;
     int quantity;
 
-    public OrderProduct(String id, String name, Double price){
+    public OrderProduct(String id, String name, Double price, int tag_number){
         this.id = id;
         this.productName = name;
         this.productPrice = price;
+        this.tag_number = tag_number;
         this.quantity = 0;
     }
 
     public String getId(){return this.id;}
+
+    public int getTag_number() {
+        return tag_number;
+    }
 
     public String getName(){
         return productName;

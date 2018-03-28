@@ -29,6 +29,7 @@ public class NfcActivity extends AppCompatActivity {
     PrivateKey privateKey;
     Signature sg;
     byte[] assinatura;
+    Order order;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class NfcActivity extends AppCompatActivity {
         setContentView(R.layout.activity_nfc);
 
         Bundle extras = getIntent().getExtras();
-        Order order = (Order) extras.get("order");
+        order = (Order) extras.getSerializable("order");
 
 
         checkForNfc();
@@ -52,10 +53,7 @@ public class NfcActivity extends AppCompatActivity {
         // assinatura tem 48 bytes
         // usar 1 byte para o numero de produtos
 
-        SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
-        String userId = settings.getString("userId", "not found");
-
-        byte[] userIdByte = userId.getBytes();
+        byte[] userIdByte = order.getUserId().getBytes();
         byte sizeOfUserIdByte = (byte) userIdByte.length;
 
         int numberOfProducts = order.getProducts().size();
@@ -66,7 +64,7 @@ public class NfcActivity extends AppCompatActivity {
 
 
         //ESTRUTURA: tamanho do ID (1 byte), ID, tamanho dos produtos(1 byte), produtos(tamanho * 25 pq é 1 byte para a quantidade e 24byte para o nome), tamanho dos vouchers(1 byte), vouchers (tamanho * 24)
-        Integer sizeOfByteBuffer = 1 + sizeOfUserIdByte + 1 + numberOfProducts * 25 + 1 + numberOfVouchers * 25 + 64;
+        Integer sizeOfByteBuffer = 1 + sizeOfUserIdByte + 1 + numberOfProducts * 2 + 1 + numberOfVouchers * 25 + 64;
         int sizeUsed = 0;
 
         ByteBuffer bb = ByteBuffer.allocate(sizeOfByteBuffer);
@@ -75,20 +73,20 @@ public class NfcActivity extends AppCompatActivity {
         sizeUsed += 1;
         bb.put(userIdByte);
         sizeUsed += sizeOfUserIdByte;
-        bb.put((byte) (numberOfProductsByte * 25));
+        bb.put((byte) (numberOfProductsByte * 2));
         sizeUsed += 1;
         //FOREACH products
         for (OrderProduct p: order.getProducts()) {
             bb.put((byte) p.getQuantity());
-            bb.put(p.getName().getBytes());
-            sizeUsed+= 25;
+            bb.put((byte) p.getTag_number());
+            sizeUsed+= 2;
         }
 
         bb.put((byte) (numberOfVouchersByte * 24));
         sizeUsed += 1;
         //FOREACH vouchers
         for (Voucher v: order.getVouchers()) {
-            bb.put(v.getId().getBytes());
+            bb.putInt(v.getId());
             sizeUsed+= 25;
         }
 
@@ -137,7 +135,7 @@ public class NfcActivity extends AppCompatActivity {
         System.out.println("BB STRING:");
 
         for (byte b: bb.array()) {
-            System.out.println((char) b);
+            System.out.println(b);
         }
 
 

@@ -22,6 +22,10 @@ public class Order implements Serializable{
         this.vouchers = vouchers;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public ArrayList<OrderProduct> getProducts() {
         return products;
     }
