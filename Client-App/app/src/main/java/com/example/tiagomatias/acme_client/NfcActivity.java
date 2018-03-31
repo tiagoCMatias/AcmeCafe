@@ -63,7 +63,12 @@ public class NfcActivity extends AppCompatActivity {
 
 
 
-        //ESTRUTURA: tamanho do ID (1 byte), ID, tamanho dos produtos(1 byte), produtos(tamanho * 25 pq é 1 byte para a quantidade e 24byte para o nome), tamanho dos vouchers(1 byte), vouchers (tamanho * 24)
+        //ESTRUTURA: tamanho do ID (1 byte),
+        // ID,
+        // tamanho dos produtos(1 byte),
+        // produtos(tamanho * 25 pq é 1 byte para a quantidade e 24byte para o nome),
+        // tamanho dos vouchers(1 byte),
+        // vouchers (tamanho * 24)
         Integer sizeOfByteBuffer = 1 + sizeOfUserIdByte + 1 + numberOfProducts * 2 + 1 + numberOfVouchers * 25 + 64;
         int sizeUsed = 0;
 

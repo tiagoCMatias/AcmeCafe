@@ -5,13 +5,13 @@ const NodeRSA = require('node-rsa');
 
 const User = require('../modules/user');
 
-router.get('/', (req, res, next) => {
+router.get("/", (req, res, next) => {
     res.status(200).json({
         message: 'Users ACME - GET'
     });
 });
 
-router.get('/all', (req, res, next) => {
+router.get("/all", (req, res, next) => {
     User.find()
         .exec()
         .then(doc => {
@@ -24,7 +24,7 @@ router.get('/all', (req, res, next) => {
         });
 });
 
-router.post('/new', (req, res, next) => {
+router.post("/new", (req, res, next) => {
     
     if(!isInt(req.body.nif))
     {
@@ -59,7 +59,7 @@ router.post('/new', (req, res, next) => {
 });
 
 
-router.delete('/delete/:id' , (req, res, next) => {
+router.delete("/:id" , (req, res, next) => {
     User.findByIdAndRemove(req.params.id, function (err, user) {
         if (err)
             throw err; 

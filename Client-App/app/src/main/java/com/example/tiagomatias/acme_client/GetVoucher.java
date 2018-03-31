@@ -27,7 +27,7 @@ public class GetVoucher implements Runnable {
 
         try {
 
-            url = new URL("http://192.168.1.179:3000" + address);
+            url = new URL("http://192.168.1.132:3000" + address);
 
             urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -48,7 +48,7 @@ public class GetVoucher implements Runnable {
                 System.out.println("Code: " + responseCode);
         }
         catch (Exception e) {
-            System.out.println(e.toString());
+            System.out.println("Failed to get Vouchers"+e.toString());
         }
         finally {
             if(urlConnection != null)

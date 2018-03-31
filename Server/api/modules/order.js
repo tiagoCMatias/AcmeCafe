@@ -5,11 +5,22 @@ const Product = require('./products');
 const User = require('./user');
 const Voucher = require('./voucher');
 
-
 const orderSchema = Schema({
-    products: [ {type: Schema.ObjectId, ref: 'Product', require:true }, ],
+    products: [{
+        qt: Number,
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+        }
+    }],
     user:  {type: Schema.ObjectId, ref: 'User', require:true },
-    voucher: [ {type: Schema.ObjectId, ref: 'Voucher' }],
+    voucher: [{
+        type: String,
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    }],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

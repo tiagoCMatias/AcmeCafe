@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 public class Order implements Serializable{
 
-    String userId;
-    ArrayList<OrderProduct> products;
-    ArrayList<Voucher> vouchers;
-    Double price;
+    public String userId;
+    public ArrayList<OrderProduct> products;
+    public ArrayList<Voucher> vouchers;
+    public Double price;
 
     public Order(String userId, ArrayList<OrderProduct> products, ArrayList<Voucher> vouchers, Double price){
         this.userId = userId;
@@ -27,6 +27,12 @@ public class Order implements Serializable{
     }
 
     public ArrayList<OrderProduct> getProducts() {
+        //for (OrderProduct product : products ) {
+            //System.out.print("\nProduct_Id: "+ product.getId());
+            //System.out.print("\nProduct_Name: "+ product.getName());
+            //System.out.print("\nProduct_tag: "+ product.getTag_number());
+            //System.out.print("\nProduct_Qt: "+ product.getQuantity());
+        //}
         return products;
     }
 

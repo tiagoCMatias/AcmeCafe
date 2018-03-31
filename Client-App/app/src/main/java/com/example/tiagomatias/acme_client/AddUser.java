@@ -35,7 +35,7 @@ public class AddUser implements Runnable {
         HttpURLConnection urlConnection = null;
 
         try {
-            url = new URL("http://192.168.1.179:3000" + address);
+            url = new URL("http://192.168.1.132:3000" + address);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);

@@ -14,14 +14,21 @@ import com.example.tiagomatias.acme_client.Adapters.ConfirmOrderVouchersListAdap
 import com.example.tiagomatias.acme_client.Models.Order;
 import com.example.tiagomatias.acme_client.Models.OrderProduct;
 import com.example.tiagomatias.acme_client.Models.Voucher;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.DataOutputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OrderConfirmActivity extends AppCompatActivity {
 
@@ -52,7 +59,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
         price.setText(String.valueOf(priceRound) + " €");
 
         showProducts(productsSelected);
-        showVouchers();
+        //showVouchers();
 
         Button confirm = findViewById(R.id.confirm);
         confirm.setOnClickListener(new View.OnClickListener() {
@@ -60,11 +67,96 @@ public class OrderConfirmActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 order = makeOrder();
-                nfcCall();
+/*
+                System.out.print("Making Order\n");
+                order.getProducts();
+                System.out.println("\nUserId: " + order.getUserId());
+                System.out.println("\nVouchers: " + order.getVouchers());
+                System.out.println("\nPrice: " + order.getPrice());*/
+                //nfcCall();
+                //sendOrder(order);
+
+                SendOrder sendOrder = new SendOrder(order);
+                Thread thr = new Thread(sendOrder);
+                thr.start();
+                try {
+                    thr.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
+
+    public void sendOrder(Order order)
+    {
+        Map<String, String> data = new HashMap<>();
+
+        JSONObject jOrderType = new JSONObject();
+        try
+        {
+            JSONArray jProductData = new JSONArray ();
+            for (OrderProduct product : order.products)  {
+                JSONObject obj = new JSONObject();
+                //System.out.print("\nProduct_Id: "+ product.getId());
+                obj.put("product_id", product.id.toString());
+                //System.out.print("\nProduct_Name: "+ product.getName());
+                obj.put("product_name", product.productName.toString());
+                //System.out.print("\nProduct_tag: "+ product.getTag_number());
+                obj.put("product_tag", product.tag_number);
+                //System.out.print("\nProduct_Qt: "+ product.getQuantity());
+                obj.put("product_qt", product.quantity);
+                jProductData.put( obj.toString() );
+            }
+            jOrderType.put("products", jProductData.toString());
+
+
+        }
+        catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+        URL url;
+        HttpURLConnection urlConnection = null;
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        String json = gson.toJson(jOrderType.toString());
+        System.out.println("Printing json");
+        System.out.println(json);
+
+        try {
+            url = new URL("http://172.30.25.111:3000/order/new" );
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setUseCaches (false);
+
+            DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
+            outputStream.writeBytes(json);
+            outputStream.flush();
+            outputStream.close();
+
+            // get response
+            int responseCode = urlConnection.getResponseCode();
+            System.out.println("ADDINg");
+            if(responseCode == 201) {
+                System.out.println("Code: " + responseCode);
+            }
+            else {
+                System.out.println("Code: " + responseCode);
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        finally {
+            if(urlConnection != null)
+                urlConnection.disconnect();
+        }
+    }
 
     public void showProducts(ArrayList<OrderProduct> productsList){
         final ListView products = findViewById(R.id.order_products);
@@ -76,17 +168,19 @@ public class OrderConfirmActivity extends AppCompatActivity {
     }
 
     public void showVouchers(){
-        getVouchers();
+        System.out.println("Trying to get Vouchers");
+        if(getVouchers()) {
 
-        final ListView vouchers = findViewById(R.id.order_vouchers);
+            final ListView vouchers = findViewById(R.id.order_vouchers);
 
-        adapterVouchers =  new ConfirmOrderVouchersListAdapter(this,
-                R.layout.confirm_order_vouchers_item, this.vouchers);
+            adapterVouchers = new ConfirmOrderVouchersListAdapter(this,
+                    R.layout.confirm_order_vouchers_item, this.vouchers);
 
-        vouchers.setAdapter(adapterVouchers);
+            vouchers.setAdapter(adapterVouchers);
+        }
     }
 
-    public void getVouchers(){
+    public boolean getVouchers(){
 
         SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
         String userId = settings.getString("userId", "not found");
@@ -98,9 +192,13 @@ public class OrderConfirmActivity extends AppCompatActivity {
             thr.join();
             String response = getVoucher.response;
             System.out.println("VOUCHERS: "+response);
+            if(response != null)
             createVoucherObject(response);
+            return true;
         } catch (InterruptedException e) {
+            System.out.println("Failed to get Vouchers");
             e.printStackTrace();
+            return false;
         }
 
     }
@@ -119,6 +217,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
                 this.vouchers.add(v);
             }
         } catch (JSONException e) {
+            System.out.println("Failed to Create Vouchers");
             e.printStackTrace();
         }
     }
@@ -142,3 +241,5 @@ public class OrderConfirmActivity extends AppCompatActivity {
         startActivity(intent);
     }
 }
+
+
