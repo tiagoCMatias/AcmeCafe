@@ -9,12 +9,25 @@ import android.app.Application;
 public class GlobalVariables extends Application {
 
     public static String url = "http://172.30.25.111:3000";
+    public static String voucherCoffee = "Free Coffee";
+    public static String voucherDiscount = "Discount 5%";
+    public static Double coffeePrice = 0.6;
+    public static Double discount = 0.05;
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
 
     public String getUrl() {
         return url;
+    }
+
+    public static String getVoucherCoffe() {
+        return voucherCoffee;
+    }
+
+    public static String getVoucherDiscount() {
+        return voucherDiscount;
+    }
+
+    public static Double getCoffeePrice() {
+        return coffeePrice;
     }
 }

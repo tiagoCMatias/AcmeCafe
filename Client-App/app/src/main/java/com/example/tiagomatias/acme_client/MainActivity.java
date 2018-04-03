@@ -25,7 +25,7 @@ import javax.crypto.NoSuchPaddingException;
 public class MainActivity extends AppCompatActivity {
 
     KeyStore keyStore;
-    String alias = "keys", username;
+    String alias = "keys", username, userId;
     PrivateKey privateKey;
     byte[] encryptedBytes;
 
@@ -77,13 +77,33 @@ public class MainActivity extends AppCompatActivity {
     public void logIn() throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, UnrecoverableEntryException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, BadPaddingException {
 
         SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
-        username = settings.getString("username", "NOT FOUND");
+        username = settings.getString("username", "USERNAME NOT FOUND");
+        userId = settings.getString("userId", "ID NOT FOUND");
+
+        VerifyUser verify = new VerifyUser("/user/"+ userId);
+        Thread thr = new Thread(verify);
+        thr.start();
+
+        try {
+            thr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (verify.responseCode == 200){
+            System.out.println("Existo");
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+        }else {
+            System.out.println("EU Não");
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        }
+
 
 //        getKeys();
 //        encrypt();
 
-        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-        startActivity(intent);
     }
 
     public void encrypt() throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IOException, CertificateException, KeyStoreException, UnrecoverableEntryException {

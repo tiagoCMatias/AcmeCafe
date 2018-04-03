@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tiagomatias.acme_client">
 
-
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -26,7 +25,8 @@
         <activity android:name=".OrderActivity" />
         <activity android:name=".VouchersActivity" />
         <activity android:name=".OrderConfirmActivity" />
-        <activity android:name=".NfcActivity"></activity>
+        <activity android:name=".NfcActivity" />
+        <activity android:name=".OrderFinalInfoActivity"></activity>
     </application>
 
 </manifest>

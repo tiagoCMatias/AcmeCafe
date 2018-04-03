@@ -6,16 +6,16 @@ package com.example.tiagomatias.acme_client.Models;
 
 public class Voucher {
 
-    //Integer id;
-    String type;
+    public Integer id;
+    public String type;
 
-    public Voucher(String type){
-        //this.id = id;
+    public Voucher(Integer id, String type){
+        this.id = id;
         this.type = type;
     }
 
     public Integer getId() {
-        return 0;
+        return id;
     }
 
     public String getType() {

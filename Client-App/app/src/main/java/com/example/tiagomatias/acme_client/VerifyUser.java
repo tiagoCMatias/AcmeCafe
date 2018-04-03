@@ -8,34 +8,31 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by Henrique on 27/03/2018.
+ * Created by Henrique on 03/04/2018.
  */
 
-public class GetVoucher implements Runnable {
+public class VerifyUser implements Runnable {
 
     String address = null;
     String response;
     int responseCode;
 
-    GetVoucher(String baseAddress) {
+    public VerifyUser(String baseAddress) {
         address = baseAddress;
     }
 
     @Override
     public void run() {
+
         URL url;
         HttpURLConnection urlConnection = null;
 
         try {
 
             url = new URL(GlobalVariables.url + address);
-
             urlConnection = (HttpURLConnection) url.openConnection();
-
             urlConnection.setDoInput(true);
-
             urlConnection.setRequestProperty("Content-Type", "application/json");
-
             urlConnection.setUseCaches (false);
 
             int responseCode = urlConnection.getResponseCode();

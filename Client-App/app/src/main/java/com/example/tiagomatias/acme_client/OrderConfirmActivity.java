@@ -52,7 +52,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
         price.setText(String.valueOf(priceRound) + " €");
 
         showProducts(productsSelected);
-        //showVouchers();
+        showVouchers();
 
         Button confirm = findViewById(R.id.confirm);
         confirm.setOnClickListener(new View.OnClickListener() {
@@ -65,8 +65,23 @@ public class OrderConfirmActivity extends AppCompatActivity {
                 SendOrder send = new SendOrder(order);
                 Thread thr = new Thread(send);
                 thr.start();
+                try {
+                    thr.join();
+                    Intent i = new Intent(OrderConfirmActivity.this, OrderFinalInfoActivity.class);
+                    i.putExtra("price", order.getPrice());
+                    startActivity(i);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.vouchers.clear();
+        showVouchers();
     }
 
 
@@ -95,16 +110,22 @@ public class OrderConfirmActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("user_info", MODE_PRIVATE);
         String userId = settings.getString("userId", "not found");
 
-        GetVoucher getVoucher = new GetVoucher("/vouchers/"+userId);
+        GetVoucher getVoucher = new GetVoucher("/voucher/"+userId);
         Thread thr = new Thread(getVoucher);
         thr.start();
         try {
             thr.join();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (getVoucher.responseCode == 200){
             String response = getVoucher.response;
             System.out.println("VOUCHERS: "+response);
             createVoucherObject(response);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        }else {
+
         }
 
     }
@@ -114,11 +135,12 @@ public class OrderConfirmActivity extends AppCompatActivity {
         try {
             JSONObject vouchers = new JSONObject(response);
             JSONArray json = vouchers.getJSONArray("voucher");
-            for (int i = 0; i< json.length(); i++){
-                //Integer id = (Integer) json.getJSONObject(i).get("_id");
-                String type = (String) json.getJSONObject(i).get("_id");
 
-                Voucher v = new Voucher(type);
+            for (int i = 0; i< json.length(); i++){
+                Integer id = (Integer) json.getJSONObject(i).get("_id");
+                String type = (String) json.getJSONObject(i).get("type");
+
+                Voucher v = new Voucher(id, type);
 
                 this.vouchers.add(v);
             }
@@ -129,9 +151,28 @@ public class OrderConfirmActivity extends AppCompatActivity {
 
     public Order makeOrder(){
 
-        Order o = new Order(this.userId, this.productsSelected, this.vouchers, this.price);
+        ArrayList<Voucher> selectedVouchers = this.adapterVouchers.getSelectedVouchers();
+
+        Double price = calculatePrice(selectedVouchers);
+
+        Order o = new Order(this.userId, this.productsSelected, selectedVouchers, price);
 
         return o;
+    }
+
+    public Double calculatePrice(ArrayList<Voucher> selectedVouchers){
+
+        Double price = this.price;
+
+        for (Voucher v: selectedVouchers) {
+            if(v.getType().equals(GlobalVariables.voucherCoffee)){
+                price -= GlobalVariables.coffeePrice;
+            }else if(v.getType().equals(GlobalVariables.voucherDiscount)){
+                price -= price*GlobalVariables.discount;
+            }
+        }
+        
+        return price;
     }
 
     public void nfcCall(){

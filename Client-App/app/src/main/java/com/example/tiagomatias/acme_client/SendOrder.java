@@ -3,6 +3,7 @@ package com.example.tiagomatias.acme_client;
 
 import com.example.tiagomatias.acme_client.Models.Order;
 import com.example.tiagomatias.acme_client.Models.OrderProduct;
+import com.example.tiagomatias.acme_client.Models.Voucher;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -51,10 +52,21 @@ public class SendOrder implements Runnable {
                 obj.addProperty("qt", String.valueOf(product.quantity));
                 jProductData.add( obj );
             }
+
+            JsonArray jVoucherData = new JsonArray ();
+            for (Voucher voucher : order.vouchers)  {
+                System.out.println("IDV:" + voucher.getId());
+                JsonObject obj = new JsonObject();
+                //System.out.print("\nProduct_Id: "+ product.getId());
+                obj.addProperty("_id", String.valueOf(voucher.getId()));
+                //System.out.print("\nProduct_Name: "+ product.getName());
+                obj.addProperty("type", voucher.getType());
+                jVoucherData.add(obj);
+            }
             jOrderType.addProperty("user",  order.getUserId() );
             jOrderType.addProperty("price",  order.getPrice() );
             jOrderType.add("products",  jProductData );
-
+            jOrderType.add("vouchers",  jVoucherData );
         }
         catch (Exception e) {
             System.out.println(e.toString());
@@ -127,6 +139,8 @@ public class SendOrder implements Runnable {
                 }
             }
         }
+
+        System.out.println(response.toString());
 
         return response.toString();
     }

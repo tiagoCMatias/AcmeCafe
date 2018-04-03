@@ -25,11 +25,16 @@ public class ConfirmOrderVouchersListAdapter extends BaseAdapter {
     public ArrayList<Voucher> vouchers;
     int layoutId;
     Context mContext;
+    public ArrayList<Voucher> selectedVouchers = new ArrayList<>();
 
     public ConfirmOrderVouchersListAdapter(Context mContext, int layoutResourceId, ArrayList<Voucher> vouchers){
         this.layoutId = layoutResourceId;
         this.mContext = mContext;
         this.vouchers = vouchers;
+    }
+
+    public ArrayList<Voucher> getSelectedVouchers() {
+        return this.selectedVouchers;
     }
 
     @Override
@@ -48,7 +53,7 @@ public class ConfirmOrderVouchersListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup) {
+    public View getView(final int position, View convertView, ViewGroup viewGroup) {
         View row = convertView;
         VoucherHolder holder;
 
@@ -74,7 +79,11 @@ public class ConfirmOrderVouchersListAdapter extends BaseAdapter {
         holder.name.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                if (isChecked) {
+                    selectedVouchers.add(vouchers.get(position));
+                }else{
+                    selectedVouchers.remove(vouchers.get(position));
+                }
             }
         });
 
