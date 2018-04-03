@@ -6,10 +6,10 @@ package com.example.tiagomatias.acme_client.Models;
 
 public class Product {
 
-    String id;
-    String name;
-    Double price;
-    Integer tag_number;
+    public String id;
+    public String name;
+    public Double price;
+    public Integer tag_number;
 
     public Product(String id, String name, Double price, Integer tag_number){
         this.id = id;

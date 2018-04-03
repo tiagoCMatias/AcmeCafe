@@ -10,11 +10,11 @@ import java.io.Serializable;
 
 public class OrderProduct implements Serializable {
 
-    String id;
-    int tag_number;
-    String productName;
-    Double productPrice;
-    int quantity;
+    public String id;
+    public int tag_number;
+    public String productName;
+    public Double productPrice;
+    public int quantity;
 
     public OrderProduct(String id, String name, Double price, int tag_number){
         this.id = id;

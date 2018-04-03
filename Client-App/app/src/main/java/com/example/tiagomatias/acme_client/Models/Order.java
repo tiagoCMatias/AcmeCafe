@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 public class Order implements Serializable{
 
-    String userId;
-    ArrayList<OrderProduct> products;
-    ArrayList<Voucher> vouchers;
-    Double price;
+    public String userId;
+    public ArrayList<OrderProduct> products;
+    public ArrayList<Voucher> vouchers;
+    public Double price;
 
     public Order(String userId, ArrayList<OrderProduct> products, ArrayList<Voucher> vouchers, Double price){
         this.userId = userId;

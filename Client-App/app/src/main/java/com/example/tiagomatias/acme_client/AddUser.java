@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.PublicKey;
 
 /**
  * Created by Henrique on 14/03/2018.
@@ -35,7 +34,8 @@ public class AddUser implements Runnable {
         HttpURLConnection urlConnection = null;
 
         try {
-            url = new URL("http://192.168.1.179:3000" + address);
+
+            url = new URL(GlobalVariables.url+ address);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);

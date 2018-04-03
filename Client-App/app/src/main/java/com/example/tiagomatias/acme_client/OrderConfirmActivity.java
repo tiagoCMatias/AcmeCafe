@@ -52,7 +52,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
         price.setText(String.valueOf(priceRound) + " €");
 
         showProducts(productsSelected);
-        showVouchers();
+        //showVouchers();
 
         Button confirm = findViewById(R.id.confirm);
         confirm.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +60,11 @@ public class OrderConfirmActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 order = makeOrder();
-                nfcCall();
+                //nfcCall();
+
+                SendOrder send = new SendOrder(order);
+                Thread thr = new Thread(send);
+                thr.start();
             }
         });
     }
