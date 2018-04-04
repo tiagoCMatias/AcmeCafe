@@ -137,7 +137,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
             JSONArray json = vouchers.getJSONArray("voucher");
 
             for (int i = 0; i< json.length(); i++){
-                Integer id = (Integer) json.getJSONObject(i).get("_id");
+                String id = (String) json.getJSONObject(i).get("_id");
                 String type = (String) json.getJSONObject(i).get("type");
 
                 Voucher v = new Voucher(id, type);
