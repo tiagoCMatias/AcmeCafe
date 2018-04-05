@@ -88,7 +88,7 @@ public class SendOrder implements Runnable {
 
 
             //ASSINATURA
-            jOrderType.addProperty("assinatura", this.assinatura.toString());
+            jOrderType.addProperty("assinatura", byteArrayToHex(assinatura));
 
 
             jOrderType.add("products",  jProductData );
@@ -230,14 +230,14 @@ public class SendOrder implements Runnable {
 
             sg = Signature.getInstance("SHA1WithRSA");                    // for signing with the stated algorithm (Signing and verifying object)
             sg.initSign(privateKey);                                             // supply the private key
-            sg.update(bb.array());                                             // define the data to sign
+            sg.update(userIdByte);                                             // define the data to sign
             assinatura = sg.sign();
             sizeUsed+= assinatura.length;
             System.out.println("Sign SiZE: " + assinatura.length);
             System.out.println("USED: " + sizeUsed);
             System.out.println(bb.array().length);
             System.out.println("ASS: " + assinatura.toString());
-            bb.put(assinatura);//BufferOverflowException
+            //bb.put(assinatura);//BufferOverflowException
 
         } catch (KeyStoreException e) {
             e.printStackTrace();
@@ -268,6 +268,13 @@ public class SendOrder implements Runnable {
             System.out.println(b);
         }
 
+    }
+
+    String byteArrayToHex(byte[] ba) {
+        StringBuilder sb = new StringBuilder(ba.length * 2);
+        for(byte b: ba)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
     }
 }
 

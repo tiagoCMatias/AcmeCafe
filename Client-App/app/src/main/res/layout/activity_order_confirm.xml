@@ -23,7 +23,7 @@
     <ListView
         android:id="@+id/order_products"
         android:layout_width="fill_parent"
-        android:layout_height="195dp"
+        android:layout_height="164dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
@@ -58,7 +58,7 @@
     <ListView
         android:id="@+id/order_vouchers"
         android:layout_width="fill_parent"
-        android:layout_height="113dp"
+        android:layout_height="168dp"
         android:layout_marginBottom="48dp"
         app:layout_constraintBottom_toTopOf="@+id/confirm"
         app:layout_constraintEnd_toEndOf="parent"

@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.tiagomatias.acme_client.Models.Product;
 
@@ -78,9 +80,12 @@ public class RegisterActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
-                addUser(name, number);
-                Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
-                startActivity(intent);
+
+                if (checkEmptyFields(name, number)) {
+                    addUser(name, number);
+                    Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                }
 
             }
         });
@@ -234,6 +239,14 @@ public class RegisterActivity extends AppCompatActivity {
         for(byte b: ba)
             sb.append(String.format("%02x", b));
         return sb.toString();
+    }
+
+    public boolean checkEmptyFields(EditText name, EditText nif){
+        if (name.getText().toString().trim().length() <= 0 || nif.getText().toString().trim().length() <= 0) {
+            Toast.makeText(RegisterActivity.this, "Fields can't be empty", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
     }
 
 }

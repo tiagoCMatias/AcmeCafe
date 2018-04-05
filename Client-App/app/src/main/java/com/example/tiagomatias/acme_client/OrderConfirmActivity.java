@@ -97,12 +97,38 @@ public class OrderConfirmActivity extends AppCompatActivity {
     public void showVouchers(){
         getVouchers();
 
+        ArrayList<Voucher> vouchersAvailable = vouchersThatCanBeUsed();
+
         final ListView vouchers = findViewById(R.id.order_vouchers);
 
         adapterVouchers =  new ConfirmOrderVouchersListAdapter(this,
-                R.layout.confirm_order_vouchers_item, this.vouchers);
+                R.layout.confirm_order_vouchers_item, vouchersAvailable);
 
         vouchers.setAdapter(adapterVouchers);
+    }
+
+    public ArrayList<Voucher> vouchersThatCanBeUsed(){
+
+        ArrayList<Voucher> vouchers = new ArrayList<>();
+
+        int coffeesOrdered = 0;
+
+        for (OrderProduct o: this.productsSelected) {
+            if (o.getTag_number() == 2 ){
+                coffeesOrdered = o.getQuantity();
+            }
+        }
+
+        for (Voucher v: this.vouchers) {
+            if (v.getType().equals(GlobalVariables.voucherCoffee) && coffeesOrdered > 0){
+                vouchers.add(v);
+                coffeesOrdered -= 1;
+            }else if (v.getType().equals(GlobalVariables.voucherDiscount)){
+                vouchers.add(v);
+            }
+        }
+
+        return vouchers;
     }
 
     public void getVouchers(){
