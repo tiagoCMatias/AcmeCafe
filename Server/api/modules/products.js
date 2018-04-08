@@ -17,3 +17,10 @@ const productSchema = Schema({
 });
 
 module.exports = mongoose.model('Product', productSchema);
+
+productSchema.plugin(autoIncrement.plugin, {
+    model: 'Product',
+    field: 'tag_number',
+    startAt: 1,
+    incrementBy: 1
+});

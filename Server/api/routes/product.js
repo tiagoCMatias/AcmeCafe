@@ -28,8 +28,7 @@ router.post('/new', (req, res, next) => {
 
     const product = new Product({
         name: req.body.name,
-        price: req.body.price,
-        tag_number: req.body.tag
+        price: req.body.price
     });
 
     product
