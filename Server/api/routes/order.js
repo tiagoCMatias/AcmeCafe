@@ -6,6 +6,7 @@ const getPem = require('rsa-pem-from-mod-exp');
 
 var crypto = require('crypto');
 var fs = require('fs');
+var ByteBuffer = require("bytebuffer");
 var SIGNATURE_FORMAT = "base64"; // Accepted: hex, latin1, base64
 
 const Order = require('../modules/order');
@@ -24,158 +25,211 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.post('/test', (req, res, next) => {
-    
+router.post('/teste', (req, res, next) => {
+
     const user = req.body.user;
-    let signature = req.body.assinatura;
+    const price = req.body.price;
 
-    getUserData(user).then(userDoc => { 
-        let publicKey = userDoc.publicKey;
+    const signature = req.body.assinatura;
 
-        let new_key = Buffer.from(publicKey, 'base64');
+    let verification = false;
+    getUserData(user)
+        .then(userData => {
+            var public_key = userData.publicKey;
 
-        let exponent = "65537";
+            var bb = ByteBuffer.fromHex(public_key);
 
-        exponent = Buffer.from(exponent, 'base64');
+            bb = bb.toBase64().toString();
 
-        publicKey = getPem(new_key, exponent);
+            var exponent = "AQAB";
 
-        //signature = Buffer.from(signature, 'base64');
+            var pem = getPem(bb, exponent);
 
+            let message = user;
 
-        console.log(">>> A:" + signature);
-        console.log(">>> E:" + exponent);
-        console.log(">>> U:" + user);
-        console.log(">>> P:" + publicKey);
-        validateMessage(publicKey, signature, Buffer.from(user, 'base64'));
+            var verify = crypto.createVerify("sha1WithRSAEncryption"); //sha1WithRSAEncryption
+                
+            verify.update(message);
 
-        res.status(201).json({
-            message: "New order added",
+            console.log('\n>>> Message:\n\n' + message);
+            
+            verification = verify.verify(pem, signature, 'hex');
+
+            console.log('\n>>> Verify: ' + verification);
+
+            res.status(200).json({
+                message: 'Verify Signature',
+                status: verification
+            });
+        })
+        .catch(err=> { 
+            console.log("err: " + err); 
+            res.status(200).json({
+                message: 'Verify Signature',
+                status: verification
+            });
         });
-
-    });
-
+    
 });
 
 router.post('/new', (req, res, next) => {
-
+    
     const user = req.body.user;
     const products = req.body.products;
     const vouchers = req.body.vouchers;
     const price = req.body.price;
-
     const signature = req.body.assinatura;
-/*
-    getUserData(user).then(voucherDoc => { 
-        let publicKey = voucherDoc.publicKey;
-        publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALZy5szJUfnlxKxVOFkxmhyToln3NzrJENpvTrglP+zyyhnu3ZeBSpj6Fa03zV5FoVQ+BT+zxciBDm18KjFJUqMCAwEAAQ==";
-        let verification = validateMessage(publicKey, signature);
 
-    }).catch(err => {
-        console.log("erro na signature");
-    });
-*/
-    const order = new Order({
-        products: products,
-        user_id:  user,
-        price: price,
-        voucher: vouchers
-    });
+    let coffee_order = 0;
 
+    let coffee_in_current_order = 0;
+    let coffee_voucher_in_order = 0;
+    let discount_voucher_in_order = 0;
     const coffee_id = "5ac399be111e652110ee1c51";
-    let maxMoney = 0;
-    let maxCoffe = 0;
-    let coffee_qt = 0;
-    
+
+    let total_vouchers = 0;
+    let total_money_spent = 0;
+
+    console.log("User: " + user);
+
+    if(!checkEncription(user, signature, user))
+    {
+        res.status(403).json({
+            message: "Encryption Failed",
+        });
+    }
 
     products.forEach(element => {
         if(element._id == coffee_id)
         {
-            coffee_qt = element.qt
-            //console.log("qt: " + element.qt);
+            coffee_in_current_order = Number(element.qt);
+            console.log("coffee_in_current_order: " + element.qt);
         }
     });
-
-    registerOrder(order).then(doc => {
-        console.log("Order register");
-    });
-
-    let voucher_in_order_coffee = 0;
 
     vouchers.forEach(element => {
         if(element.type == Voucher_Coffe)
-            voucher_in_order_coffee++;
-        updateVoucherState(element._id).then(res => { /*console.log("updating voucher state");*/ });
+        {
+            coffee_voucher_in_order++;
+            updateVoucherState(element._id).then(res => { /*console.log("updating voucher state");*/ });
+        }
+        if(element.type == Voucher_Discount)
+        {
+            discount_voucher_in_order++;
+            updateVoucherState(element._id).then(res => { /*console.log("updating voucher state");*/ });
+        }
     });
 
-  
-
+    
     getTotalMoneySpent(user)
         .then(discountDoc => { 
-            maxMoney = (discountDoc+price); 
-            maxMoney = (maxMoney/100);
+            total_money_spent = (discountDoc+price); 
+            total_money_spent = (total_money_spent/100);
         });
+    getUserData(user).then(doc => { total_vouchers = doc.coffe; }).catch();
 
     getTotalCoffesOrdered(user, coffee_id)
-        .then(coffeeDoc => {
-            //console.log("pago: " + coffeeDoc);
-            //console.log("pedido: " + coffee_qt);
-            //let coffee = (Number(coffeeDoc) + Number(coffee_qt));
-            //console.log("coffee: " + coffee);
-            //maxCoffe = coffee/3;
-            //console.log("maxCoffee: " + maxCoffe);
-            //maxCoffe = Math.floor(maxCoffe);
-            maxCoffe = (Number(coffeeDoc) + Number(coffee_qt));
-            console.log("maxCoffe: " + maxCoffe);
-        });
-    let total_vouchers = 0;
-    getUserData(user).then(data => { total_vouchers = data.coffe; console.log(data);});
+        .then(totalCoffees => { 
+            total_cafe = totalCoffees;
+        getUserVoucher(user)
+            .then(userVouchers => { 
+                console.log(userVouchers);
+                let voucher_cafe_util = userVouchers.coffe; 
+                let voucher_discount = userVouchers.money;
+                let coffee_pagos = (total_cafe - voucher_cafe_util);
 
-    getUserVoucher(user).then(voucherDoc => { 
-        let voucher_coffe = voucherDoc.coffe;
-        let voucher_money = voucherDoc.money;
-        //let gerar = (maxCoffe - voucher_coffe - voucher_in_order_coffee);
-        let cafes_pagos = maxCoffe - voucher_coffe;
- 
-        let cafe_para_gerar_voucher = (cafes_pagos - (total_vouchers*3));
+                coffee_pagos = coffee_pagos + (coffee_in_current_order - coffee_voucher_in_order);
+                
+                console.log("Vouchers gerados:" + total_vouchers);
+                console.log("Total Cafes Pedidos:" + coffee_order);
+                console.log("Vouchers Usados:" + voucher_cafe_util);
+                console.log("Cafes Pagos:" + coffee_pagos);
 
-        let voucher_a_gerar = Math.floor(cafe_para_gerar_voucher/3);
-        console.log("total_vouchers: " + total_vouchers);
-        console.log("cafes_pagos: " + cafes_pagos);
-        console.log("voucher_a_gerar: " + voucher_a_gerar);
-        if(voucher_a_gerar)
-        {
-            const new_qt = voucher_a_gerar;
-            for(var i = 0 ; i < new_qt; i++)
-            {
-                addUserNewCoffeVoucher(user, new_qt).then(res => { /*console.log("adding voucher");*/ });
-            }  
-            console.log("Voucher Coffee Created: " + new_qt);
-        }
+                let gerar = Math.floor(coffee_pagos/3);
 
-        if( voucher_money < maxMoney ){
-            const new_qt = Math.floor(maxMoney) - voucher_money;
+                if(total_vouchers < gerar){
+                    let qt = gerar - total_vouchers;
+                    for(var i = 0 ; i < qt; i++)
+                    {
+                        addUserNewCoffeVoucher(user, gerar).then(res => { /*console.log("adding voucher");*/ });
+                    }  
+                    console.log("Voucher Coffee Created: " + gerar);
+                }
+
+                if( voucher_discount < total_money_spent ){
+                    const new_qt = Math.floor(total_money_spent) - voucher_discount;
+                    
+                    for(var i = 0 ; i < new_qt; i++)
+                    {
+                        addUserNewMoneyVoucher(user, new_qt).then(res => {  });
+                    } 
+                    console.log("Voucher Discount Created: " + new_qt);
+                }
+
+                const order = new Order({
+                    products: products,
+                    user_id:  user,
+                    price: price,
+                    voucher: vouchers
+                });
             
-            for(var i = 0 ; i < new_qt; i++)
-            {
-                addUserNewMoneyVoucher(user, maxCoffe).then(res => {  });
-            } 
-            console.log("Voucher Discount Created: " + new_qt);
-        }
-        res.status(201).json({
-            message: "New order added",
-            order: order
-        });
+                registerOrder(order).then(doc => {
+                    res.status(201).json({
+                        message: "New order added",
+                        order: order
+                    });
+                });
+            });
     });
-
 });
 
+
+function checkEncription(user, signature, message){
+    return new Promise(function (resolve, reject) {
+        resolve(checkPublicKeyEncription(user, signature, message));
+    });
+}
+
+function checkPublicKeyEncription(user, signature, message){
+    getUserData(user)
+        .then(userData => {
+            var public_key = userData.publicKey;
+
+            var bb = ByteBuffer.fromHex(public_key);
+
+            bb = bb.toBase64().toString();
+
+            var exponent = "AQAB";
+
+            var pem = getPem(bb, exponent);
+
+            let message = user;
+
+            var verify = crypto.createVerify("sha1WithRSAEncryption"); //sha1WithRSAEncryption
+                
+            verify.update(message);
+
+            //console.log('\n>>> Message:\n\n' + message);
+            
+            let verification = verify.verify(pem, signature, 'hex');
+
+            console.log('\n>>> Verify: ' + verification);
+
+            if(verification)
+                return true;
+            else
+                return false;
+
+        })
+        .catch(err=> { console.log("err: " + err); return false;});
+}
 
 function registerOrder(order){
     return new Promise(function (resolve, reject) {
         resolve(registerNewOrder(order));
     });
 }
+
 
 function registerNewOrder(order){
     order
@@ -199,11 +253,10 @@ function createNewVoucher(user, voucher_type){
     voucher
     .save()
     .then(result => {
-        //console.log("Created new voucher");
-        //res.status(201).json({ message: "All Done"});
+        return true;
     })
     .catch(error => {
-        //console.log("Error creating voucher");
+        console.log("Error: " + error);
     });
 }
 
@@ -215,10 +268,9 @@ function addUserNewCoffeVoucher(user, voucher_qt){
             .exec()
             .then(doc => {
                 createNewVoucher(user, Voucher_Coffe)
-                //console.log("User updated");
             })
             .catch(err => {
-                //console.log("Error :" + err);
+                console.log("Error :" + err);
             })
         );
     });
@@ -231,7 +283,6 @@ function updateVoucherState(voucher_id){
             .exec()
             .then(doc => {
                 return true;
-                //console.log("User updated");
             })
             .catch(err => {
                 return false;
@@ -250,7 +301,6 @@ function addUserNewMoneyVoucher(user, voucher_qt){
             .exec()
             .then(doc => {
                 createNewVoucher(user, Voucher_Discount)
-                //console.log("User updated");
             })
             .catch(err => {
                 return false;
@@ -307,6 +357,7 @@ function getUserData(user){
             .findById(user)
             .exec()
             .then(doc => {
+                if(doc)
                 return {
                     coffe: doc.private_coffe_voucher_qt,
                     money: doc.private_price_voucher_qt,
@@ -358,15 +409,16 @@ function getTotalMoneySpent(user){
         .exec()
         .then(doc => {
             let max_price = 0;
-            doc.forEach(element => {
-                //console.log("Money: "+ element.price);
-               max_price += element.price; 
-            });
-            return max_price;
-            
+            if(doc.length > 0){
+                doc.forEach(element => {
+                    //console.log("Money: "+ element.price);
+                   max_price += element.price; 
+                });
+            }
+            return max_price;            
         })
         .catch(err => {
-            console.log(err);
+            console.log("err: "+err);
         }));
     });
 }
