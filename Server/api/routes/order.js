@@ -16,7 +16,7 @@ const Voucher = require('../modules/voucher');
 
 
 const Voucher_Coffe = "Free Coffee";
-const Voucher_Discount = "Discount 5%";
+const voucherDiscount = "Discount 5%";
 
 
 router.get('/', (req, res, next) => {
@@ -25,7 +25,7 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.post('/teste', (req, res, next) => {
+router.post("/teste", (req, res, next) => {
 
     const user = req.body.user;
     const price = req.body.price;
@@ -35,9 +35,9 @@ router.post('/teste', (req, res, next) => {
     let verification = false;
     getUserData(user)
         .then(userData => {
-            var public_key = userData.publicKey;
+            var publicKey = userData.publicKey;
 
-            var bb = ByteBuffer.fromHex(public_key);
+            var bb = ByteBuffer.fromHex(publicKey);
 
             bb = bb.toBase64().toString();
 
@@ -51,21 +51,21 @@ router.post('/teste', (req, res, next) => {
                 
             verify.update(message);
 
-            console.log('\n>>> Message:\n\n' + message);
+            console.log("\n>>> Message:\n\n" + message);
             
-            verification = verify.verify(pem, signature, 'hex');
+            verification = verify.verify(pem, signature, "hex");
 
-            console.log('\n>>> Verify: ' + verification);
+            console.log("\n>>> Verify: " + verification);
 
             res.status(200).json({
-                message: 'Verify Signature',
+                message: "Verify Signature",
                 status: verification
             });
         })
-        .catch(err=> { 
+        .catch(err => { 
             console.log("err: " + err); 
             res.status(200).json({
-                message: 'Verify Signature',
+                message: "Verify Signature",
                 status: verification
             });
         });
@@ -82,40 +82,47 @@ router.post('/new', (req, res, next) => {
 
     let coffee_order = 0;
 
-    let coffee_in_current_order = 0;
-    let coffee_voucher_in_order = 0;
-    let discount_voucher_in_order = 0;
-    const coffee_id = "5ac399be111e652110ee1c51";
+    let coffeeInCurrentOrder = 0;
+    let coffeeVoucherInOrder = 0;
+    let discountVoucherInOrder = 0;
+    const coffeeID = "5ac399be111e652110ee1c51";
 
-    let total_vouchers = 0;
+    let totalCoffeeVoucher = 0;
     let total_money_spent = 0;
 
     console.log("User: " + user);
 
-    if(!checkEncription(user, signature, user))
-    {
-        res.status(403).json({
-            message: "Encryption Failed",
+    checkEncription(user, signature, user)
+        .then(response => { 
+            if(response == false) {
+                res.status(403).json({
+                    message: "Encryption Failed",
+                });
+            }
+        })
+        .catch(err => {
+            res.status(403).json({
+                message: "Encryption Failed",
+                err: err
+            });
         });
-    }
 
     products.forEach(element => {
-        if(element._id == coffee_id)
+        if(element._id == coffeeID)
         {
-            coffee_in_current_order = Number(element.qt);
-            console.log("coffee_in_current_order: " + element.qt);
+            coffeeInCurrentOrder = Number(element.qt);
         }
     });
 
     vouchers.forEach(element => {
         if(element.type == Voucher_Coffe)
         {
-            coffee_voucher_in_order++;
+            coffeeVoucherInOrder++;
             updateVoucherState(element._id).then(res => { /*console.log("updating voucher state");*/ });
         }
-        if(element.type == Voucher_Discount)
+        if(element.type == voucherDiscount)
         {
-            discount_voucher_in_order++;
+            discountVoucherInOrder++;
             updateVoucherState(element._id).then(res => { /*console.log("updating voucher state");*/ });
         }
     });
@@ -126,29 +133,29 @@ router.post('/new', (req, res, next) => {
             total_money_spent = (discountDoc+price); 
             total_money_spent = (total_money_spent/100);
         });
-    getUserData(user).then(doc => { total_vouchers = doc.coffe; }).catch();
+    getUserData(user).then(doc => { totalCoffeeVoucher = doc.coffe; }).catch();
 
-    getTotalCoffesOrdered(user, coffee_id)
+    getTotalCoffesOrdered(user, coffeeID)
         .then(totalCoffees => { 
             total_cafe = totalCoffees;
         getUserVoucher(user)
             .then(userVouchers => { 
                 console.log(userVouchers);
-                let voucher_cafe_util = userVouchers.coffe; 
-                let voucher_discount = userVouchers.money;
-                let coffee_pagos = (total_cafe - voucher_cafe_util);
+                let voucherCoffeeUtil = userVouchers.coffe; 
+                let voucherDiscount = userVouchers.money;
+                let coffeePaid = (total_cafe - voucherCoffeeUtil);
 
-                coffee_pagos = coffee_pagos + (coffee_in_current_order - coffee_voucher_in_order);
+                coffeePaid = coffeePaid + (coffeeInCurrentOrder - coffeeVoucherInOrder);
                 
-                console.log("Vouchers gerados:" + total_vouchers);
+                console.log("Vouchers gerados:" + totalCoffeeVoucher);
                 console.log("Total Cafes Pedidos:" + coffee_order);
-                console.log("Vouchers Usados:" + voucher_cafe_util);
-                console.log("Cafes Pagos:" + coffee_pagos);
+                console.log("Vouchers Usados:" + voucherCoffeeUtil);
+                console.log("Cafes Pagos:" + coffeePaid);
 
-                let gerar = Math.floor(coffee_pagos/3);
+                let gerar = Math.floor(coffeePaid/3);
 
-                if(total_vouchers < gerar){
-                    let qt = gerar - total_vouchers;
+                if(totalCoffeeVoucher < gerar){
+                    let qt = gerar - totalCoffeeVoucher;
                     for(var i = 0 ; i < qt; i++)
                     {
                         addUserNewCoffeVoucher(user, gerar).then(res => { /*console.log("adding voucher");*/ });
@@ -156,8 +163,8 @@ router.post('/new', (req, res, next) => {
                     console.log("Voucher Coffee Created: " + gerar);
                 }
 
-                if( voucher_discount < total_money_spent ){
-                    const new_qt = Math.floor(total_money_spent) - voucher_discount;
+                if( voucherDiscount < total_money_spent ){
+                    const new_qt = Math.floor(total_money_spent) - voucherDiscount;
                     
                     for(var i = 0 ; i < new_qt; i++)
                     {
@@ -300,7 +307,7 @@ function addUserNewMoneyVoucher(user, voucher_qt){
             User.update({ _id: user}, { $set: { private_price_voucher_qt: voucher_qt }})
             .exec()
             .then(doc => {
-                createNewVoucher(user, Voucher_Discount)
+                createNewVoucher(user, voucherDiscount)
             })
             .catch(err => {
                 return false;
@@ -326,7 +333,7 @@ function getUserVoucher(user){
                     doc.forEach(element => {
                         if(element.type == Voucher_Coffe)
                             coffe = coffe +1 ;
-                        if(element.type == Voucher_Discount)
+                        if(element.type == voucherDiscount)
                             price = price + 1;
                     });
                     
@@ -371,19 +378,19 @@ function getUserData(user){
     });
 }
 
-function getTotalCoffesOrdered(user, coffee_id){
+function getTotalCoffesOrdered(user, coffeeID){
     return new Promise(function (resolve, reject) {
         resolve(
             Order
             .find()
             .where('user_id').equals(user)
-            .where('products._id').equals(coffee_id)
+            .where('products._id').equals(coffeeID)
             .exec()
             .then(doc => {
                 let max_coffe_qt = 0;
                 doc.forEach(element => {
                     element.products.forEach(element => {
-                        if(element._id == coffee_id)
+                        if(element._id == coffeeID)
                         {
                             //console.log("Confirmed ID - " + element.qt);
                             max_coffe_qt += element.qt;
