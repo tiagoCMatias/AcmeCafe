@@ -1,57 +1,128 @@
 package com.example.tiagomatias.acme_nfc;
 
-import android.content.Intent;
-import android.nfc.NdefMessage;
-import android.nfc.NfcAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.widget.Button;
-import android.view.View;
-import java.util.ArrayList;
+
+import com.example.tiagomatias.acme_nfc.Models.Product;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class NFCMain extends AppCompatActivity {
-    ArrayList<String> order;
+    NFCApp app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        app = (NFCApp)getApplication();
         setContentView(R.layout.activity_nfc_main);
+        GetProducts productsRun = new GetProducts("/product/all");
+        Thread productsThr = new Thread(productsRun);
+        productsThr.start();
 
-        final Button button = findViewById(R.id.readTag);
+        try {
+            productsThr.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        button.setOnClickListener(new View.OnClickListener() { public void onClick(View v) {
-                showOrder(v);
-            }
-        });
+        String response = productsRun.response;
+        createProductObject(response);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            processIntent(getIntent());
+    private class GetProducts implements Runnable {
+        String address;
+        String response;
+
+        GetProducts(String addr) {
+            address = addr;
+        }
+
+        @Override
+        public void run() {
+            URL url;
+            HttpURLConnection urlConnection = null;
+
+            try {
+                url = new URL(GlobalVariables.url + address);
+
+                urlConnection = (HttpURLConnection)url.openConnection();
+                urlConnection.setDoInput(true);
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setUseCaches(false);
+
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode == 201) {
+                    InputStream response = urlConnection.getInputStream();
+                    this.response = readStream(response);
+                } else {
+                    System.out.println("Code: " + responseCode);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+        }
+
+        private String readStream(InputStream in) {
+            BufferedReader reader = null;
+            StringBuffer response = new StringBuffer();
+            try {
+                reader = new BufferedReader(new InputStreamReader(in));
+
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return response.toString();
         }
     }
 
-    @Override
-    public void onNewIntent(Intent intent) {
-        setIntent(intent);
-    }
+    /**
+     * Created by Henrique.
+     */
+    public void createProductObject(String response){
 
-    void processIntent(Intent intent) {
-        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        NdefMessage msg = (NdefMessage) rawMsgs[0];
-        int err = this.processMessage(new String(msg.getRecords()[0].getPayload()));
-    }
+        try {
+            JSONArray json = new JSONArray(response);
+            for (int i = 0; i< json.length(); i++){
+                String id = (String) json.getJSONObject(i).get("_id");
+                String name = (String) json.getJSONObject(i).get("name");
+                Double price = (Double) json.getJSONObject(i).get("price");
+                Integer tag_number = (Integer)json.getJSONObject(i).get("tag_number");
 
-    private int processMessage(String message) {
-        return 0;
-    }
+                Product p = new Product(id, name, price, tag_number);
 
-    private void showOrder(View view) {
-        Intent intent = new Intent(this, DisplayOrderActivity.class);
-        intent.putExtra("order", order);
-        startActivity(intent);
+                app.products.add(p);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

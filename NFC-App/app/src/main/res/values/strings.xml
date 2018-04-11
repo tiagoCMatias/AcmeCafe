@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Acme-NFC</string>
-    <color name="gray">#333333</color>
     <color name="white">#FFFFFF</color>
     <string name="title_activity_display_order">DisplayOrderActivity</string>
     <string name="order_header">Order No.:</string>

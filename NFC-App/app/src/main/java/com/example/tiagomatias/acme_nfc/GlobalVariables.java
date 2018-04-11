@@ -1,4 +1,4 @@
-package com.example.tiagomatias.acme_client;
+package com.example.tiagomatias.acme_nfc;
 
 import android.app.Application;
 

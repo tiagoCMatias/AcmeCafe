@@ -64,7 +64,8 @@ public class AddUser implements Runnable {
             }
         }
         catch (Exception e) {
-            System.out.println(e.toString());
+            //System.out.println(e.toString());
+            e.printStackTrace();
         }
         finally {
             if(urlConnection != null)

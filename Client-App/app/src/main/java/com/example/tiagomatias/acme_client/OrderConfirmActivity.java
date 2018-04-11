@@ -60,8 +60,8 @@ public class OrderConfirmActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 order = makeOrder();
-                //nfcCall();
-
+                nfcCall();
+/*
                 SendOrder send = new SendOrder(order);
                 Thread thr = new Thread(send);
                 thr.start();
@@ -72,7 +72,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
                     startActivity(i);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
     }
