@@ -32,7 +32,7 @@ router.post("/teste", (req, res, next) => {
 
     const signature = req.body.assinatura;
 
-    let verification = false;
+    var verification = false;
     getUserData(user)
         .then(userData => {
             var publicKey = userData.publicKey;
@@ -45,7 +45,7 @@ router.post("/teste", (req, res, next) => {
 
             var pem = getPem(bb, exponent);
 
-            let message = user;
+            var message = user;
 
             var verify = crypto.createVerify("sha1WithRSAEncryption"); //sha1WithRSAEncryption
                 
@@ -80,15 +80,15 @@ router.post('/new', (req, res, next) => {
     const price = req.body.price;
     const signature = req.body.assinatura;
 
-    let coffee_order = 0;
+    var coffee_order = 0;
 
-    let coffeeInCurrentOrder = 0;
-    let coffeeVoucherInOrder = 0;
-    let discountVoucherInOrder = 0;
-    const coffeeID = "5ac399be111e652110ee1c51";
+    var coffeeInCurrentOrder = 0;
+    var coffeeVoucherInOrder = 0;
+    var discountVoucherInOrder = 0;
+    const coffeeID = "5aba9f42f8869a2848577fc7";
 
-    let totalCoffeeVoucher = 0;
-    let total_money_spent = 0;
+    var totalCoffeeVoucher = 0;
+    var total_money_spent = 0;
 
     console.log("User: " + user);
 
@@ -141,9 +141,9 @@ router.post('/new', (req, res, next) => {
         getUserVoucher(user)
             .then(userVouchers => { 
                 console.log(userVouchers);
-                let voucherCoffeeUtil = userVouchers.coffe; 
-                let voucherDiscount = userVouchers.money;
-                let coffeePaid = (total_cafe - voucherCoffeeUtil);
+                var voucherCoffeeUtil = userVouchers.coffe; 
+                var voucherDiscount = userVouchers.money;
+                var coffeePaid = (total_cafe - voucherCoffeeUtil);
 
                 coffeePaid = coffeePaid + (coffeeInCurrentOrder - coffeeVoucherInOrder);
                 
@@ -152,10 +152,10 @@ router.post('/new', (req, res, next) => {
                 console.log("Vouchers Usados:" + voucherCoffeeUtil);
                 console.log("Cafes Pagos:" + coffeePaid);
 
-                let gerar = Math.floor(coffeePaid/3);
+                var gerar = Math.floor(coffeePaid/3);
 
                 if(totalCoffeeVoucher < gerar){
-                    let qt = gerar - totalCoffeeVoucher;
+                    var qt = gerar - totalCoffeeVoucher;
                     for(var i = 0 ; i < qt; i++)
                     {
                         addUserNewCoffeVoucher(user, gerar).then(res => { /*console.log("adding voucher");*/ });
@@ -210,7 +210,7 @@ function checkPublicKeyEncription(user, signature, message){
 
             var pem = getPem(bb, exponent);
 
-            let message = user;
+            var message = user;
 
             var verify = crypto.createVerify("sha1WithRSAEncryption"); //sha1WithRSAEncryption
                 
@@ -218,7 +218,7 @@ function checkPublicKeyEncription(user, signature, message){
 
             //console.log('\n>>> Message:\n\n' + message);
             
-            let verification = verify.verify(pem, signature, 'hex');
+            var verification = verify.verify(pem, signature, 'hex');
 
             console.log('\n>>> Verify: ' + verification);
 
@@ -328,8 +328,8 @@ function getUserVoucher(user){
             .then(doc => {
                 if(doc.length > 0)
                 {
-                    let coffe = 0;
-                    let price = 0;
+                    var coffe = 0;
+                    var price = 0;
                     doc.forEach(element => {
                         if(element.type == Voucher_Coffe)
                             coffe = coffe +1 ;
@@ -387,7 +387,7 @@ function getTotalCoffesOrdered(user, coffeeID){
             .where('products._id').equals(coffeeID)
             .exec()
             .then(doc => {
-                let max_coffe_qt = 0;
+                var max_coffe_qt = 0;
                 doc.forEach(element => {
                     element.products.forEach(element => {
                         if(element._id == coffeeID)
@@ -415,7 +415,7 @@ function getTotalMoneySpent(user){
         .select('price')
         .exec()
         .then(doc => {
-            let max_price = 0;
+            var max_price = 0;
             if(doc.length > 0){
                 doc.forEach(element => {
                     //console.log("Money: "+ element.price);
@@ -442,7 +442,7 @@ function validateMessage(publicKey, signature, mensagem) {
 
     console.log('\n>>> Message:\n\n' + mensagem);
     
-    let verification = verify.verify(publicKey, signature, SIGNATURE_FORMAT);
+    var verification = verify.verify(publicKey, signature, SIGNATURE_FORMAT);
 
     console.log('\n>>> Verify: ' + verification);
 
