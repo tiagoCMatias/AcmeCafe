@@ -6,15 +6,15 @@ cache:
   directories:
   - node_modules
 node_js:
-- 4
+- 6
 before_install:
+- cd Server
 - npm install -g node-gyp
 install:
 - npm install -g codecov
 before_script:
 - npm install
 - npm install -g standard
-- cd ..
 script:
 - npm test
 after_success: npm run coverage

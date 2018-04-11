@@ -58,9 +58,8 @@ describe('User', () => {
             .get('/user/all')
             .end((err, res) => {
                 res.should.have.status(201);
-                res.body.should.be.a('array');
-                res.body.length.should.be.eql(0);
-              done();
+                res.body.should.have.property('message');
+                done();
             });
     });
   });

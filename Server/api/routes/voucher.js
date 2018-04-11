@@ -3,12 +3,6 @@ const router = express.Router();
 
 const Voucher = require('../modules/voucher');
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'Vouchers - GET'
-    });
-});
-
 router.post('/new', (req, res, next) => {
     const voucher = new Voucher({
         user_id: req.body.user_id,
@@ -35,12 +29,25 @@ router.post('/new', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
     const request_id = req.params.id;
-    Voucher.find({'user_id' : request_id})
+    Voucher
+        .find()
+        .where('user_id').equals(request_id)
+        .where('state').equals(false)
         .exec()
         .then(doc => {
-            res.status(200).json({
-                voucher: doc
-            });
+            if(doc.length > 0)
+            {
+                res.status(200).json({
+                    message: 'Voucher Found',
+                    voucher: doc
+                });
+            }
+            else {
+                res.status(205).json({
+                    message: 'Voucher Not Found',
+                });
+            }
+            
         })
         .catch(error => {
             res.status(400).json({
