@@ -10,8 +10,11 @@ router.get("/all", (req, res, next) => {
     User.find()
         .exec()
         .then(doc => {
-            if(doc){
+            if(doc.length > 0){
                 res.status(201).json(doc);
+            }
+            else{
+                res.status(201).json({message: 'No users Found'});    
             }
         })
         .catch(error => {
