@@ -6,7 +6,7 @@
 
 
 ### Steps 
-1. Install the software stated in the [Software needed](https://github.com/tiagoCMatias/AcmeCafe/master/Server/README.md#software-needed) section.
+1. Install the software stated in the [Software needed](https://github.com/tiagoCMatias/AcmeCafe/tree/master/Server#software-needed) section.
 2. Clone the **AcmeCafe** project using the command `https://github.com/tiagoCMatias/AcmeCafe.git` or download it manually [here](https://github.com/tiagoCMatias/AcmeCafe/archive/master.zip).
 3. Go to the Server folder of the project
 4. Inside the server folder run `npm install`
