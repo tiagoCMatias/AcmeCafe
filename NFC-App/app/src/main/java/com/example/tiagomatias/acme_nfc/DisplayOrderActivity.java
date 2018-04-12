@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.example.tiagomatias.acme_nfc.Models.OrderProduct;
 import com.example.tiagomatias.acme_nfc.Models.Product;
@@ -17,14 +17,17 @@ import com.example.tiagomatias.acme_nfc.Models.Voucher;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
  * Mensagem de order:
@@ -38,7 +41,7 @@ public class DisplayOrderActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        app = (NFCApp)getApplication();
+        app = (NFCApp) getApplication();
         setContentView(R.layout.activity_display_order);
     }
 
@@ -62,113 +65,9 @@ public class DisplayOrderActivity extends AppCompatActivity {
     void processIntent(Intent intent) throws IOException {
         Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
         NdefMessage msg = (NdefMessage) rawMsgs[0];
-        int err = this.processOrder(msg.getRecords()[0].getPayload());
-    }
-
-    private int processOrder(byte[] order) throws IOException {
-        int currPosition = 0;
-        int sizeUserID = order[currPosition];
-        currPosition++;
-
-        ArrayList<Byte> userID = new ArrayList<>();
-        while (currPosition <= sizeUserID) {
-            userID.add(order[currPosition]);
-            currPosition++;
-        }
-
-        int numProducts = order[currPosition];
-        currPosition++;
-        ArrayList<OrderProduct> products = new ArrayList<>();
-        double price = 0;
-        while (currPosition <= numProducts*2) {
-            for (Product product : app.products) {
-                if (order[currPosition + 1] == product.getTag_number()) {
-                    products.add(new OrderProduct(product.getId(), product.getName(), product.getPrice(), product.getTag_number()));
-                    products.get(products.size() - 1).setQuantity((int) order[currPosition]);
-                    price = price + product.getPrice()*order[currPosition];
-                    break;
-                }
-            }
-            currPosition = currPosition+2;
-        }
-
-        int numVouchers = order[currPosition];
-        currPosition++;
-        ArrayList<Byte[]> voucherList = new ArrayList<>();
-        ArrayList<Voucher> vouchers = new ArrayList<>();
-        while (currPosition < numVouchers*12) {
-            Byte[] voucher = new Byte[12];
-            System.arraycopy(order, currPosition, voucher,0, 12);
-            voucherList.add(voucher);
-            currPosition = currPosition+12;
-        }
-
-        URL url;
-        HttpURLConnection urlConnection;
-
-        for (Byte[] voucher : voucherList) {
-            url = new URL(GlobalVariables.url + "/voucher/" + voucher.toString());
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setDoInput(true);
-            urlConnection.setRequestProperty("Content-Type", "application/json");
-            urlConnection.setUseCaches(false);
-
-            int responseCode = urlConnection.getResponseCode();
-            if (responseCode == 201) {
-                String response = readStream(urlConnection.getInputStream());
-                try {
-                    JSONArray json = new JSONArray(response);
-                    for (int i = 0; i< json.length(); i++){
-                        String type = (String) json.getJSONObject(i).get("type");
-
-                        Voucher v = new Voucher(voucher[1].toString(), type);
-
-                        vouchers.add(v);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                System.out.println("Code: " + responseCode);
-            }
-        }
-
-        byte[] sig = new byte[order.length - currPosition];
-        System.arraycopy(order, currPosition, sig, 0, sig.length);
-
-
-        int orderID = 00000;
-        presentOrder(orderID, products, vouchers, price);
-        return 0;
-    }
-
-    private String readStream(InputStream in) {
-        BufferedReader reader = null;
-        StringBuffer response = new StringBuffer();
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
-
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-        }
-        catch (IOException e) {
-            return e.getMessage();
-        }
-        finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                }
-                catch (IOException e) {
-                    return e.getMessage();
-                }
-            }
-        }
-
-        return response.toString();
+        byte[] order = msg.getRecords()[0].getPayload();
+        Thread pOrder = new Thread(new ProcessOrder(order));
+        pOrder.start();
     }
 
     private void presentOrder(int orderID, ArrayList<OrderProduct> products, ArrayList<Voucher> vouchers, double price) {
@@ -180,7 +79,7 @@ public class DisplayOrderActivity extends AppCompatActivity {
         LinearLayout productList = findViewById(R.id.productsList);
         for (OrderProduct product : products) {
             productList.addView(new TextView(this), new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-            TextView productView = (TextView)productList.getChildAt(productList.getChildCount() - 1);
+            TextView productView = (TextView) productList.getChildAt(productList.getChildCount() - 1);
             productView.setTextColor(Color.parseColor("#000000"));
             productView.setText(product.getName());
         }
@@ -189,7 +88,7 @@ public class DisplayOrderActivity extends AppCompatActivity {
         LinearLayout voucherList = findViewById(R.id.vouchersList);
         for (Voucher voucher : vouchers) {
             voucherList.addView(new TextView(this), new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-            TextView voucherView = (TextView)voucherList.getChildAt(voucherList.getChildCount() - 1);
+            TextView voucherView = (TextView) voucherList.getChildAt(voucherList.getChildCount() - 1);
             voucherView.setTextColor(Color.parseColor("#000000"));
             voucherView.setText(voucher.getType());
         }
@@ -197,6 +96,193 @@ public class DisplayOrderActivity extends AppCompatActivity {
         // set order price
         err = findViewById(R.id.price);
         err.setText(Double.toString(price));
+    }
+
+    private class ProcessOrder implements Runnable {
+        byte[] order;
+        String response;
+
+        ProcessOrder(byte[] order) {
+            this.order = order;
+        }
+
+        @Override
+        public void run() {
+
+            System.out.println("PAYLOAD: " + Arrays.toString(order));
+
+            int currPosition = 0;
+            int sizeUserID = order[currPosition];
+            currPosition++;
+
+            ArrayList<Byte> userID = new ArrayList<>();
+            while (currPosition <= sizeUserID) {
+                userID.add(order[currPosition]);
+                currPosition++;
+            }
+
+            System.out.println("userID:" + userID);
+
+            int numProducts = order[currPosition] * 2 + currPosition;
+            currPosition++;
+            ArrayList<OrderProduct> products = new ArrayList<>();
+            double price = 0;
+            while (currPosition <= numProducts) {
+                for (Product product : app.products) {
+                    if (order[currPosition + 1] == product.getTag_number()) {
+                        products.add(new OrderProduct(product.getId(), product.getName(), product.getPrice(), product.getTag_number()));
+                        products.get(products.size() - 1).setQuantity((int) order[currPosition]);
+                        price = price + product.getPrice() * order[currPosition];
+
+                        System.out.println(products.get(products.size()-1).getName());
+                        break;
+                    }
+                }
+                currPosition = currPosition + 2;
+            }
+
+            int numVouchers = order[currPosition] * 12 + currPosition;
+            currPosition++;
+            ArrayList<byte[]> voucherList = new ArrayList<>();
+            ArrayList<Voucher> vouchers = new ArrayList<>();
+            while (currPosition < numVouchers) {
+                byte[] voucher = new byte[12];
+                System.arraycopy(order, currPosition, voucher, 0, 12);
+                voucherList.add(voucher);
+                currPosition = currPosition + 1;
+            }
+
+            URL url;
+            HttpURLConnection urlConnection;
+
+            for (byte[] voucher : voucherList) {
+                try {
+                    url = new URL(GlobalVariables.url + "/voucher/" + new String(voucher, "ISO-8859-1"));
+
+
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setDoInput(true);
+                    urlConnection.setRequestProperty("Content-Type", "application/json");
+                    urlConnection.setUseCaches(false);
+
+                    int responseCode = urlConnection.getResponseCode();
+                    if (responseCode == 201) {
+                        String response = readStream(urlConnection.getInputStream());
+                        try {
+                            JSONArray json = new JSONArray(response);
+                            String type = (String) json.getJSONObject(0).get("type");
+
+                            Voucher v = new Voucher(new String(voucher, "ISO-8859-1"), type);
+
+                            vouchers.add(v);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.out.println("Code: " + responseCode);
+                    }
+
+                    urlConnection.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            byte[] sig = new byte[order.length - currPosition];
+            System.arraycopy(order, currPosition, sig, 0, sig.length);
+
+
+            try {
+                JSONObject jOrderType = new JSONObject();
+
+                String uID = Arrays.toString(userID.toArray()).replace(",", "").replace("[", "").replace("]", "").trim();
+
+                jOrderType.put("user",  uID);
+                jOrderType.put("price",  price );
+
+                JSONArray jsonProducts = new JSONArray ();
+                for (OrderProduct product : products)  {
+                    JSONObject obj = new JSONObject();
+                    obj.put("_id", product.id);
+                    obj.put("name", product.productName);
+                    obj.put("tag_number", String.valueOf(product.tag_number));
+                    obj.put("qt", String.valueOf(product.quantity));
+                    jsonProducts.put( obj );
+                }
+
+                JSONArray jsonVouchers = new JSONArray ();
+                for (Voucher voucher : vouchers)  {
+                    JSONObject obj = new JSONObject();
+                    obj.put("_id", String.valueOf(voucher.getId()));
+                    obj.put("type", voucher.getType());
+                    jsonVouchers.put(obj);
+                }
+
+                jOrderType.put("assinatura", byteArrayToHex(sig));
+
+
+                jOrderType.put("products",  jsonProducts );
+                jOrderType.put("vouchers",  jsonVouchers );
+
+
+                url = new URL(GlobalVariables.url + "/order/new" );
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setDoOutput(true);
+                urlConnection.setDoInput(true);
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setUseCaches (false);
+
+                DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
+                outputStream.writeBytes(jOrderType.toString());
+                outputStream.flush();
+                outputStream.close();
+
+                // get response
+                int responseCode = urlConnection.getResponseCode();
+                System.out.println("Code: " + responseCode);
+                if(responseCode == 201) {
+                    int orderID = Integer.parseInt(readStream(urlConnection.getInputStream()));
+                    presentOrder(orderID, products, vouchers, price);
+                }
+
+            } catch(IOException | JSONException e) {
+
+            }
+
+        }
+
+        private String readStream(InputStream in) {
+            BufferedReader reader = null;
+            StringBuffer response = new StringBuffer();
+            try {
+                reader = new BufferedReader(new InputStreamReader(in));
+
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return response.toString();
+        }
+
+        String byteArrayToHex(byte[] ba) {
+            StringBuilder sb = new StringBuilder(ba.length * 2);
+            for(byte b: ba)
+                sb.append(String.format("%02x", b));
+            return sb.toString();
+        }
     }
 
 }

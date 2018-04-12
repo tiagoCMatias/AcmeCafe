@@ -8,7 +8,7 @@ import android.app.Application;
 
 public class GlobalVariables extends Application {
 
-    public static String url = "http://172.30.31.173:3000";
+    public static String url = "http://172.30.25.111:3000";
     public static String voucherCoffee = "Free Coffee";
     public static String voucherDiscount = "Discount 5%";
     public static Double coffeePrice = 0.6;

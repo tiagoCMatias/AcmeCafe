@@ -1,7 +1,6 @@
 package com.example.tiagomatias.acme_nfc.Models;
 
 import java.io.Serializable;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 
 /**

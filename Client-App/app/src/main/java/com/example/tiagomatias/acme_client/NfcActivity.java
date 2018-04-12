@@ -13,6 +13,7 @@ import com.example.tiagomatias.acme_client.Models.OrderProduct;
 import com.example.tiagomatias.acme_client.Models.Voucher;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
@@ -24,6 +25,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 
 public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefPushCompleteCallback {
 
@@ -46,7 +48,15 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
             finish();
         }
 
-        NdefMessage msg = new NdefMessage(new NdefRecord[] { createMimeRecord("application/nfc.feup.apm.message.type1", makeBytesArray(order)) });
+        byte[] payload = new byte[0];
+        try {
+            payload = makeBytesArray(order);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        System.out.println("PAYLOAD: " + payload.length);
+        NdefMessage msg = new NdefMessage(new NdefRecord[] { createMimeRecord("application/com.example.tiagomatias.acme_client.order", payload) });
+        System.out.println(msg.getRecords()[0].getPayload().length);
 
         if (mNfcAdapter != null) {
             mNfcAdapter.setNdefPushMessage(msg, this);
@@ -55,14 +65,14 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
         
     }
 
-    public byte[] makeBytesArray(Order order){
+    public byte[] makeBytesArray(Order order) throws UnsupportedEncodingException {
 
         // UUID tem 16 bytes
         //INT tem 4bytes
         // assinatura tem 48 bytes
         // usar 1 byte para o numero de produtos
 
-        byte[] userIdByte = order.getUserId().getBytes();
+        byte[] userIdByte = order.getUserId().getBytes("ISO-8859-1");
         byte sizeOfUserIdByte = (byte) userIdByte.length;
 
         int numberOfProducts = order.getProducts().size();
@@ -95,7 +105,7 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
         sizeUsed += 1;
         //FOREACH vouchers
         for (Voucher v: order.getVouchers()) {
-            bb.put(v.getId().getBytes());
+            bb.put(v.getId().getBytes("ISO-8859-1"));
             sizeUsed+= 12;
         }
 
@@ -136,7 +146,7 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
 
 
         System.out.println("ID BYTE :" + userIdByte);
-        System.out.println("SIZE ID:" + sizeOfUserIdByte);
+        System.out.println("SIZE ID:" + Arrays.toString(userIdByte));
         System.out.println("SIZE P BYte:" + numberOfProductsByte);
         System.out.println("SIZE V Byte:" + numberOfVouchersByte);
 
@@ -147,8 +157,7 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
             System.out.println(b);
         }
 
-        byte[] message = new byte[bb.remaining()];
-        bb.get(message);
+        byte[] message = bb.array();
 
         return message;
 

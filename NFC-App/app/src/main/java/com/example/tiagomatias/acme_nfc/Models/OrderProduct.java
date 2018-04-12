@@ -1,7 +1,5 @@
 package com.example.tiagomatias.acme_nfc.Models;
 
-import android.content.Intent;
-
 import java.io.Serializable;
 
 /**

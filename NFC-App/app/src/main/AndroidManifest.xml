@@ -28,7 +28,7 @@
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="application/nfc.feup.apm.message.type1" />
+                <data android:mimeType="application/com.example.tiagomatias.acme_client.order" />
             </intent-filter>
         </activity>
     </application>
