@@ -242,7 +242,8 @@ public class DisplayOrderActivity extends AppCompatActivity {
                 int responseCode = urlConnection.getResponseCode();
                 System.out.println("Code: " + responseCode);
                 if(responseCode == 201) {
-                    int orderID = Integer.parseInt(readStream(urlConnection.getInputStream()));
+                    JSONArray json = new JSONArray(readStream(urlConnection.getInputStream()));
+                    int orderID = Integer.parseInt((String)json.getJSONObject(0).get("_id"));
                     presentOrder(orderID, products, vouchers, price);
                 }
 
