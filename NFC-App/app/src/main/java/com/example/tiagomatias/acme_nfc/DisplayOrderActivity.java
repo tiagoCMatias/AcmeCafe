@@ -95,7 +95,7 @@ public class DisplayOrderActivity extends AppCompatActivity {
 
         // set order price
         err = findViewById(R.id.price);
-        err.setText(Double.toString(price));
+        err.setText(price+"€");
     }
 
     private class ProcessOrder implements Runnable {
@@ -123,7 +123,7 @@ public class DisplayOrderActivity extends AppCompatActivity {
 
             System.out.println("userID:" + userID);
 
-            int numProducts = order[currPosition] * 2 + currPosition;
+            int numProducts = order[currPosition] + currPosition;
             currPosition++;
             ArrayList<OrderProduct> products = new ArrayList<>();
             double price = 0;
@@ -195,19 +195,25 @@ public class DisplayOrderActivity extends AppCompatActivity {
             try {
                 JSONObject jOrderType = new JSONObject();
 
-                String uID = Arrays.toString(userID.toArray()).replace(",", "").replace("[", "").replace("]", "").trim();
+                byte[] byteID = new byte[userID.size()];
+                for (int pos = 0; pos < byteID.length; pos++) {
+                    byteID[pos] = userID.get(pos);
+                }
+
+                String uID = new String(byteID, "ISO-8859-1");
 
                 jOrderType.put("user",  uID);
                 jOrderType.put("price",  price );
 
                 JSONArray jsonProducts = new JSONArray ();
+                System.out.println("NUM PRODUCTS "+products.size());
                 for (OrderProduct product : products)  {
                     JSONObject obj = new JSONObject();
-                    obj.put("_id", product.id);
-                    obj.put("name", product.productName);
-                    obj.put("tag_number", String.valueOf(product.tag_number));
+                    obj.put("_id", String.valueOf(product.getId()));
+                    obj.put("name", String.valueOf(product.getName()));
+                    obj.put("tag_number", String.valueOf(product.getTag_number()));
                     obj.put("qt", String.valueOf(product.quantity));
-                    jsonProducts.put( obj );
+                    jsonProducts.put(obj);
                 }
 
                 JSONArray jsonVouchers = new JSONArray ();
@@ -223,6 +229,8 @@ public class DisplayOrderActivity extends AppCompatActivity {
 
                 jOrderType.put("products",  jsonProducts );
                 jOrderType.put("vouchers",  jsonVouchers );
+
+                System.out.println(jOrderType.toString());
 
 
                 url = new URL(GlobalVariables.url + "/order/new" );
@@ -242,7 +250,8 @@ public class DisplayOrderActivity extends AppCompatActivity {
                 int responseCode = urlConnection.getResponseCode();
                 System.out.println("Code: " + responseCode);
                 if(responseCode == 201) {
-                    int orderID = Integer.parseInt(readStream(urlConnection.getInputStream()));
+                    JSONArray json = new JSONArray(readStream(urlConnection.getInputStream()));
+                    int orderID = Integer.parseInt((String)json.getJSONObject(0).get("_id"));
                     presentOrder(orderID, products, vouchers, price);
                 }
 

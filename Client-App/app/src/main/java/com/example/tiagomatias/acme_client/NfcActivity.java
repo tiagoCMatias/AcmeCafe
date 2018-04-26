@@ -73,6 +73,7 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
         // usar 1 byte para o numero de produtos
 
         byte[] userIdByte = order.getUserId().getBytes("ISO-8859-1");
+        System.out.println("USERID: " + order.getUserId());
         byte sizeOfUserIdByte = (byte) userIdByte.length;
 
         int numberOfProducts = order.getProducts().size();
@@ -119,13 +120,13 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
 
             sg = Signature.getInstance("SHA1WithRSA");                    // for signing with the stated algorithm (Signing and verifying object)
             sg.initSign(privateKey);                                             // supply the private key
-            sg.update(bb.array());                                             // define the data to sign
+            sg.update(userIdByte);                                             // define the data to sign
             assinatura = sg.sign();
             sizeUsed+= assinatura.length;
             System.out.println("Sign SiZE: " + assinatura.length);
             System.out.println("USED: " + sizeUsed);
             System.out.println(bb.array().length);
-            System.out.println(assinatura);
+            System.out.println(byteArrayToHex(assinatura));
             bb.put(assinatura);//BufferOverflowException
 
         } catch (KeyStoreException e) {
@@ -177,5 +178,12 @@ public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefP
                 finish();
             }
         });
+    }
+
+    String byteArrayToHex(byte[] ba) {
+        StringBuilder sb = new StringBuilder(ba.length * 2);
+        for(byte b: ba)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
     }
 }

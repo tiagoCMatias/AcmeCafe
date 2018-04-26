@@ -2,8 +2,8 @@ package com.example.tiagomatias.acme_client;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -15,12 +15,10 @@ import com.example.tiagomatias.acme_client.Models.Order;
 import com.example.tiagomatias.acme_client.Models.OrderProduct;
 import com.example.tiagomatias.acme_client.Models.Voucher;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class OrderConfirmActivity extends AppCompatActivity {
@@ -61,7 +59,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
 
                 order = makeOrder();
                 nfcCall();
-/*
+
                 SendOrder send = new SendOrder(order);
                 Thread thr = new Thread(send);
                 thr.start();
@@ -72,7 +70,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
                     startActivity(i);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }*/
+                }
             }
         });
     }

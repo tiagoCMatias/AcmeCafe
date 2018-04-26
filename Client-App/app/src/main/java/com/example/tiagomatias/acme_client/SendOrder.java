@@ -102,7 +102,7 @@ public class SendOrder implements Runnable {
         String json = null;
 
         json = gson.toJson(jOrderType);
-        System.out.println(json);
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+jOrderType.toString());
 
 
         try {

@@ -1,7 +1,9 @@
 package com.example.tiagomatias.acme_nfc;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.tiagomatias.acme_nfc.Models.Product;
 
@@ -23,6 +25,15 @@ public class NFCMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         app = (NFCApp)getApplication();
         setContentView(R.layout.activity_nfc_main);
+
+        findViewById(R.id.imageView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(NFCMain.this, DisplayOrderActivity.class);
+                startActivity(intent);
+            }
+        });
+
         GetProducts productsRun = new GetProducts("/product/all");
         Thread productsThr = new Thread(productsRun);
         productsThr.start();
