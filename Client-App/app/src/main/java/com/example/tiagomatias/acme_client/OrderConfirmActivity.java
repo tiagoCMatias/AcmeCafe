@@ -149,9 +149,11 @@ public class OrderConfirmActivity extends AppCompatActivity {
         if (getVoucher.responseCode == 200){
             String response = getVoucher.response;
             System.out.println("VOUCHERS: "+response);
+            System.out.println("\n\n\n\nYes: ");
+
             createVoucherObject(response);
         }else {
-
+            System.out.println("\n\n\n\nNo: ");
         }
 
     }
@@ -159,6 +161,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
     public void createVoucherObject(String response){
 
         try {
+            System.out.println("\n\n\n\nGo: ");
             JSONObject vouchers = new JSONObject(response);
             JSONArray json = vouchers.getJSONArray("voucher");
 
@@ -171,6 +174,8 @@ public class OrderConfirmActivity extends AppCompatActivity {
                 this.vouchers.add(v);
             }
         } catch (JSONException e) {
+            System.out.println("\n\n\n\nShit: ");
+
             e.printStackTrace();
         }
     }

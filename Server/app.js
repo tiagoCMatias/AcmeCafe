@@ -3,8 +3,6 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
-
 
 //connect to mongo
 const url = 'mongodb://Acme:'+ process.env.MONGO_ATLAS_PW +'@acmecafe-shard-00-00-y4uxw.mongodb.net:27017,acmecafe-shard-00-01-y4uxw.mongodb.net:27017,acmecafe-shard-00-02-y4uxw.mongodb.net:27017/test?ssl=true&replicaSet=AcmeCafe-shard-0&authSource=admin'
@@ -12,8 +10,6 @@ const url = 'mongodb://Acme:'+ process.env.MONGO_ATLAS_PW +'@acmecafe-shard-00-0
 
 console.log(url);
 mongoose.connect(url);
-autoIncrement.initialize(mongoose.connection);
-
 
 //routes
 const userRoute = require('./api/routes/user');

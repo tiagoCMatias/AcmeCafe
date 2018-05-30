@@ -5,7 +5,6 @@
  */
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const autoIncrement = require('mongoose-auto-increment');
 
 const productSchema = Schema({
     name: { type: String, require },
@@ -17,10 +16,3 @@ const productSchema = Schema({
 });
 
 module.exports = mongoose.model('Product', productSchema);
-
-productSchema.plugin(autoIncrement.plugin, {
-    model: 'Product',
-    field: 'tag_number',
-    startAt: 1,
-    incrementBy: 1
-});
