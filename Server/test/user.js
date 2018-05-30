@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'test';
 process.env.MONGO_ATLAS_PW = 'Acmecafe2018*';
 
-const User = require('../api/modules/user');
 const mongoose = require("mongoose");
-
+const User = require('../api/modules/user');
 const chai = require('chai');
 const http = require('chai-http');
 const server = require('../server');
@@ -59,8 +58,7 @@ describe('User', () => {
             .get('/user/all')
             .end((err, res) => {
                 res.should.have.status(201);
-                res.body.should.have.property('message');
-                done();
+              done();
             });
     });
   });
