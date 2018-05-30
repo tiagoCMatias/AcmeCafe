@@ -48,14 +48,4 @@ router.post('/new', (req, res, next) => {
 
 })
 
-router.delete('/:id' , (req, res, next) => {
-    Product.findByIdAndRemove(req.params.id, function (err, user) {
-        if (err)
-            throw err; 
-    });
-    res.status(201).json({
-        message: "Product deleted",
-    });
-});
-
 module.exports = router;
