@@ -1,8 +1,9 @@
 process.env.NODE_ENV = 'test';
 process.env.MONGO_ATLAS_PW = 'Acmecafe2018*';
 
-const mongoose = require("mongoose");
 const User = require('../api/modules/user');
+const mongoose = require("mongoose");
+
 const chai = require('chai');
 const http = require('chai-http');
 const server = require('../server');
