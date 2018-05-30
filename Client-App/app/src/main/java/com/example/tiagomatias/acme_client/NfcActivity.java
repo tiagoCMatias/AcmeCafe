@@ -1,7 +1,9 @@
 package com.example.tiagomatias.acme_client;
 
-import android.content.SharedPreferences;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -11,20 +13,21 @@ import com.example.tiagomatias.acme_client.Models.OrderProduct;
 import com.example.tiagomatias.acme_client.Models.Voucher;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 
-public class NfcActivity extends AppCompatActivity {
+public class NfcActivity extends AppCompatActivity implements NfcAdapter.OnNdefPushCompleteCallback {
 
     PrivateKey privateKey;
     Signature sg;
@@ -39,21 +42,38 @@ public class NfcActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         order = (Order) extras.getSerializable("order");
 
+        NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(getApplicationContext(), "NFC is not available on this device.", Toast.LENGTH_LONG).show();
+            finish();
+        }
 
-        checkForNfc();
-        makeBytesArray( order);
+        byte[] payload = new byte[0];
+        try {
+            payload = makeBytesArray(order);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        System.out.println("PAYLOAD: " + payload.length);
+        NdefMessage msg = new NdefMessage(new NdefRecord[] { createMimeRecord("application/com.example.tiagomatias.acme_client.order", payload) });
+        System.out.println(msg.getRecords()[0].getPayload().length);
 
-
+        if (mNfcAdapter != null) {
+            mNfcAdapter.setNdefPushMessage(msg, this);
+            mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+        }
+        
     }
 
-    public void makeBytesArray(Order order){
+    public byte[] makeBytesArray(Order order) throws UnsupportedEncodingException {
 
         // UUID tem 16 bytes
         //INT tem 4bytes
         // assinatura tem 48 bytes
         // usar 1 byte para o numero de produtos
 
-        byte[] userIdByte = order.getUserId().getBytes();
+        byte[] userIdByte = order.getUserId().getBytes("ISO-8859-1");
+        System.out.println("USERID: " + order.getUserId());
         byte sizeOfUserIdByte = (byte) userIdByte.length;
 
         int numberOfProducts = order.getProducts().size();
@@ -86,7 +106,7 @@ public class NfcActivity extends AppCompatActivity {
         sizeUsed += 1;
         //FOREACH vouchers
         for (Voucher v: order.getVouchers()) {
-            bb.put(v.getId().getBytes());
+            bb.put(v.getId().getBytes("ISO-8859-1"));
             sizeUsed+= 12;
         }
 
@@ -100,13 +120,13 @@ public class NfcActivity extends AppCompatActivity {
 
             sg = Signature.getInstance("SHA1WithRSA");                    // for signing with the stated algorithm (Signing and verifying object)
             sg.initSign(privateKey);                                             // supply the private key
-            sg.update(bb.array());                                             // define the data to sign
+            sg.update(userIdByte);                                             // define the data to sign
             assinatura = sg.sign();
             sizeUsed+= assinatura.length;
             System.out.println("Sign SiZE: " + assinatura.length);
             System.out.println("USED: " + sizeUsed);
             System.out.println(bb.array().length);
-            System.out.println(assinatura);
+            System.out.println(byteArrayToHex(assinatura));
             bb.put(assinatura);//BufferOverflowException
 
         } catch (KeyStoreException e) {
@@ -127,7 +147,7 @@ public class NfcActivity extends AppCompatActivity {
 
 
         System.out.println("ID BYTE :" + userIdByte);
-        System.out.println("SIZE ID:" + sizeOfUserIdByte);
+        System.out.println("SIZE ID:" + Arrays.toString(userIdByte));
         System.out.println("SIZE P BYte:" + numberOfProductsByte);
         System.out.println("SIZE V Byte:" + numberOfVouchersByte);
 
@@ -138,16 +158,32 @@ public class NfcActivity extends AppCompatActivity {
             System.out.println(b);
         }
 
+        byte[] message = bb.array();
+
+        return message;
+
     }
 
+    public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
+        byte[] mimeBytes = mimeType.getBytes(Charset.forName("ISO-8859-1"));
+        return new NdefRecord(
+                NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+    }
 
+    @Override
+    public void onNdefPushComplete(NfcEvent event) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), "Message sent.", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+    }
 
-    public void checkForNfc(){
-        // Check for available NFC Adapter
-        NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mNfcAdapter == null) {
-            Toast.makeText(getApplicationContext(), "NFC is not available on this device.", Toast.LENGTH_LONG).show();
-            finish();
-        }
+    String byteArrayToHex(byte[] ba) {
+        StringBuilder sb = new StringBuilder(ba.length * 2);
+        for(byte b: ba)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
     }
 }

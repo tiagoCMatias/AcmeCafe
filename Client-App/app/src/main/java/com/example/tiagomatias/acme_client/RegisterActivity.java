@@ -161,6 +161,9 @@ public class RegisterActivity extends AppCompatActivity {
         KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(alias, null);
         publicKey = privateKeyEntry.getCertificate().getPublicKey();
 
+        System.out.println(publicKey);
+        System.out.println(publicKey);
+
         String PubKeyString = byteArrayToHex(((RSAPublicKey)publicKey).getModulus().toByteArray());
 
 
